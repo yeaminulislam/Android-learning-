@@ -295,8 +295,21 @@ def main():
         # কম্পাইলে ব্যবহৃত R.java-র id একই কি না (পুরোনো বাগ: gen_r.py কাল্পনিক
         # id দিত, ফলে কোডের প্রতিটি রিসোর্স-লুকআপ ভুল ঠিকানায় যেত → খোলার সঙ্গে
         # সঙ্গেই Resources$NotFoundException-এ ক্র্যাশ)
-        rjava = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(apk))),
-                             'build', 'gen', 'com', 'prakriti', 'kosh', 'R.java')
+        # R.java খোঁজা হয় R.txt-এর পাশের gen/ ফোল্ডারে — ফলে যেকোনো অ্যাপের
+        # বিল্ডেই (প্রকৃতি কোষ বা ইনস্টল-পরীক্ষা) সঠিক R.java পরীক্ষা হয়
+        base_dir = os.path.dirname(os.path.abspath(rtxt))
+        pkg_path = None
+        for line in open(os.path.join(base_dir, '..', 'AndroidManifest.xml'),
+                         encoding='utf-8') if os.path.exists(
+                             os.path.join(base_dir, '..', 'AndroidManifest.xml')) else []:
+            m = re.search(r'package="([\w.]+)"', line)
+            if m:
+                pkg_path = m.group(1).replace('.', os.sep)
+                break
+        cands = [os.path.join(base_dir, 'gen', pkg_path, 'R.java')] if pkg_path else []
+        cands += [os.path.join(base_dir, 'gen', 'com', 'prakriti', 'kosh', 'R.java'),
+                  os.path.join(base_dir, 'gen', 'com', 'prakriti', 'diag', 'R.java')]
+        rjava = next((c for c in cands if os.path.exists(c)), cands[-1])
         if os.path.exists(rjava):
             src = open(rjava, encoding='utf-8').read()
             pairs = dict((n, int(v, 16)) for n, v in
@@ -313,8 +326,8 @@ def main():
     else:
         print('  (R.txt দেওয়া নেই — রিসোর্স-id মিল যাচাই বাদ)')
 
-    # ── ম্যানিফেস্টের ক্লাস dex-এ আছে কি না
-    for cls in ('com.prakriti.kosh.PrakritiApp',
+    # ── ম্যানিফেস্টের ক্লাস dex-এ আছে কি না (শুধু প্রকৃতি কোষ APK-র জন্য)
+    for cls in (('com.prakriti.kosh.PrakritiApp',
                 'com.prakriti.kosh.ui.SplashActivity',
                 'com.prakriti.kosh.ui.MainActivity',
                 'com.prakriti.kosh.ui.SetupActivity',
@@ -322,20 +335,48 @@ def main():
                 'com.prakriti.kosh.ui.SpeciesListActivity',
                 'com.prakriti.kosh.ui.SpeciesDetailActivity',
                 'com.prakriti.kosh.ui.SearchActivity',
-                'com.prakriti.kosh.ui.SettingsActivity'):
+                'com.prakriti.kosh.ui.SettingsActivity')
+            if 'com.prakriti.kosh.PrakritiApp' in classes else ()):
         if cls not in classes:
             bad('ম্যানিফেস্টের ক্লাস dex-এ নেই: ' + cls)
-    ok('ম্যানিফেস্টের সব অ্যাক্টিভিটি/Application ক্লাস dex-এ আছে')
+    if 'com.prakriti.kosh.PrakritiApp' in classes:
+        ok('ম্যানিফেস্টের সব অ্যাক্টিভিটি/Application ক্লাস dex-এ আছে')
 
-    # ── resources.arsc অ্যালাইনমেন্ট
+    # ── ZIP গঠন: প্রতিটি STORED এন্ট্রি ৪-বাইট অ্যালাইন কি না
+    #    (Android 11+ ইনস্টলার resources.arsc অসংকুচিত ও ৪-বাইট অ্যালাইন চায় —
+    #     না হলে "প্যাকেজ পার্স করা যায়নি" / ইনস্টল ব্যর্থ)
+    align_bad = []
+    with open(apk, 'rb') as f:
+        for i in z.infolist():
+            f.seek(i.header_offset)
+            head = f.read(30)
+            if head[:4] != b'PK\x03\x04':
+                align_bad.append('%s: লোকাল হেডার ম্যাজিক নেই' % i.filename)
+                continue
+            fields = struct.unpack('<HHHHHIIIHH', head[4:30])
+            method, nlen, elen = fields[2], fields[8], fields[9]
+            data_off = i.header_offset + 30 + nlen + elen
+            if method == 0 and data_off % 4:
+                align_bad.append('%s: STORED কিন্তু অ্যালাইন নয় (off=%d, %%4=%d)'
+                                 % (i.filename, data_off, data_off % 4))
+            if fields[1] & 0x08:
+                align_bad.append('%s: ডেটা-ডেস্ক্রিপ্টর ফ্ল্যাগ' % i.filename)
+    if align_bad:
+        for a in align_bad:
+            bad('ZIP অ্যালাইনমেন্ট: ' + a)
+    else:
+        ok('ZIP অ্যালাইনমেন্ট: সব STORED এন্ট্রি ৪-বাইট সীমায়, কোনো ডেটা-ডেস্ক্রিপ্টর নেই')
+
     info = z.getinfo('resources.arsc')
     if info.compress_type != zipfile.ZIP_STORED:
         bad('resources.arsc STORED নয় (API 30+ ইনস্টল আটকাবে)')
     else:
-        ok('resources.arsc STORED')
+        ok('resources.arsc STORED (%d বাইট)' % info.file_size)
 
-    # ── অ্যাসেট
-    check_asset(z, 'assets/db/prakriti_kosh.db.z')
+
+    # ── অ্যাসেট (ডেটাবেস থাকলে)
+    if 'assets/db/prakriti_kosh.db.z' in names:
+        check_asset(z, 'assets/db/prakriti_kosh.db.z')
 
     # ── স্বাক্ষর
     v1, v2 = signing_blocks(apk)

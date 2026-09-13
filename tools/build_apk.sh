@@ -52,7 +52,6 @@ echo "── ২. aapt2 link (+ R.txt)"
 "$AAPT2" link -o "$BUILD/base.apk" -I "$ANDROID_JAR" \
   --manifest "$MAIN/AndroidManifest.xml" \
   --min-sdk-version 21 --target-sdk-version "$API" \
-  --version-code "${VERSION_CODE:-1}" --version-name "${VERSION_NAME:-1.0}" \
   --output-text-symbols "$BUILD/R.txt" \
   --auto-add-overlay "$BUILD/res.zip"
 [ -s "$BUILD/R.txt" ] || { echo "✗ R.txt তৈরি হয়নি" >&2; exit 1; }

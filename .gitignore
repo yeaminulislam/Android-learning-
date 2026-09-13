@@ -11,6 +11,7 @@ android/app/src/main/assets/db/*.json
 *.apk
 !dist/prakriti-kosh.apk
 !dist/prakriti-kosh-demo.apk
+!dist/install-test.apk
 *.aab
 .gradle/
 local.properties
