@@ -65,7 +65,7 @@ https://api.github.com/repos/yeaminulislam/Android-learning-/contents/dist/prakr
 https://api.github.com/repos/yeaminulislam/Android-learning-/contents/dist/prakriti-kosh.apk?ref=arena/01a095b8-android-learning
 ```
 
-ডেমো সার্ভার (স্যান্ডবক্স চালু থাকলে): https://8080-iwz5ijqaxqvsg2gdbtg9e.e2b.app/
+ডেমো সার্ভার (স্যান্ডবক্স চালু থাকলে): https://8080-i0zho4wpcj5j8vy0vnex3.e2b.app/
 
 **নামানোর পর হ্যাশ মিলিয়ে নিন** (অসম্পূর্ণ নামলে ইনস্টল হবে না):
 
