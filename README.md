@@ -30,6 +30,29 @@ bash tools/start_all.sh --serve  # শুধু সার্ভার (APK আ�
 
 ---
 
+## 📥 APK কোথায় পাবেন
+
+**GitHub রিলিজ (নির্দেশিকাসহ):** https://github.com/yeaminulislam/Android-learning-/releases/tag/v1.0
+
+ফাইল দুটি রিপোজিটরির `dist/` ফোল্ডারে কমিট করা আছে — GitHub-এ ফাইলটি খুলে
+ডানদিকের **“Download raw file”** বোতামে ক্লিক করলেই নেমে যাবে:
+
+- ছোট (৭.১ MB): `dist/prakriti-kosh-demo.apk`
+- সম্পূর্ণ (৭৬ MB): `dist/prakriti-kosh.apk`
+
+সরাসরি ডাউনলোড URL (ব্রাউজারে বসালেই নামবে):
+
+```
+https://api.github.com/repos/yeaminulislam/Android-learning-/contents/dist/prakriti-kosh-demo.apk?ref=arena/01a095b8-android-learning
+https://api.github.com/repos/yeaminulislam/Android-learning-/contents/dist/prakriti-kosh.apk?ref=arena/01a095b8-android-learning
+```
+
+> রিলিজে APK **অ্যাটাচমেন্ট** হিসেবে নেই — বিল্ড-স্যান্ডবক্স থেকে GitHub-এর
+> আপলোড-সার্ভার `uploads.github.com`-এ TLS সংযোগ বন্ধ থাকায় (পরিবেশের সীমাবদ্ধতা)।
+> তাই ফাইল সরাসরি রিপোতেই রাখা।
+
+---
+
 ## ডাউনলোড ও ইনস্টল
 
 দুটি সংস্করণ — একই অ্যাপ, শুধু ভেতরের ডেটাবেসের আকার আলাদা:
