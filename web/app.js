@@ -464,11 +464,13 @@
     gal.appendChild(art);
     gal.appendChild(cap);
     gal.appendChild(dots);
-    gal.appendChild(el('div', 'badge', `<span style="background:${iucnColor}">${s.iucn} · ${iucnLabel}</span>`).firstChild);
+    const b1 = el('span', 'badge', `${s.iucn} · ${iucnLabel}`);
+    b1.style.background = iucnColor;
+    gal.appendChild(b1);
     if (s.extinct) {
-      const b = el('div', 'badge right');
-      b.appendChild(el('span', null, '<span class="badge" style="background:var(--iucn-ex)">বিলুপ্ত</span>'));
-      gal.appendChild(b.firstChild);
+      const b2 = el('span', 'badge right', 'বিলুপ্ত');
+      b2.style.background = 'var(--iucn-ex)';
+      gal.appendChild(b2);
     }
     gal.onclick = () => { variant = (variant + 1) % 4; paint(); };
     paint();
@@ -482,10 +484,14 @@
     if (s.authority) nameCard.appendChild(el('div', 'auth', 'প্রণেতা: ' + s.authority));
     const chips = el('div', 'badges');
     chips.style.marginTop = '12px';
-    chips.appendChild(el('span', 'badge', `<span style="background:${s.color}">${s.group_bn}</span>`).firstChild);
+    const gchip = el('span', 'badge', s.group_bn);
+    gchip.style.background = s.color || 'var(--green-primary)';
+    chips.appendChild(gchip);
     [s.class_bn, s.order_bn, s.family_bn].forEach((t) => {
-      if (t) chips.appendChild(el('span', 'badge soft',
-        `<span class="badge soft" style="background:var(--surface-alt);border:1px solid var(--outline)">${t}</span>`).firstChild);
+      if (!t) return;
+      const c = el('span', 'badge soft', t);
+      c.style.cssText = 'background:var(--surface-alt);border:1px solid var(--outline)';
+      chips.appendChild(c);
     });
     nameCard.appendChild(chips);
     const copy = el('span', 'linkish', 'নাম ও তথ্য কপি করুন');
@@ -495,7 +501,9 @@
 
     // শ্রেণিবিন্যাস
     const tax = el('div', 'card detail-card');
-    tax.appendChild(el('div', 'label', '<div class="fact label" style="margin:0">শ্রেণিবিন্যাস</div>'));
+    const taxHead = el('div', 'label', 'শ্রেণিবিন্যাস');
+    taxHead.style.cssText = 'font-size:11.5px;font-weight:700;color:var(--text-muted);letter-spacing:.04em';
+    tax.appendChild(taxHead);
     [['বিভাগ', s.group_bn + (s.group_en ? ' (' + s.group_en + ')' : '')],
     ['শ্রেণি', s.class_bn + ' · ' + s.class_id],
     ['বর্গ', s.order_bn + ' · ' + s.order_id],
@@ -530,7 +538,9 @@
 
     // নোট
     const note = el('div', 'card detail-card');
-    note.appendChild(el('div', null, '<div class="fact label" style="margin:0">আমার নোট</div>'));
+    const noteHead = el('div', null, 'আমার নোট');
+    noteHead.style.cssText = 'font-size:11.5px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:8px';
+    note.appendChild(noteHead);
     const ta = el('textarea', 'note');
     ta.placeholder = 'এই প্রজাতি সম্পর্কে নিজের নোট লিখুন…';
     ta.value = state.notes[s.id] || '';
