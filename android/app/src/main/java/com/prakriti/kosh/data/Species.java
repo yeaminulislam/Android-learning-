@@ -91,7 +91,9 @@ public final class Species {
     private static int[] ix;
 
     private static int[] idx(Cursor c) {
-        if (ix == null) {
+        // কলাম-সূচি ক্যাশ করা হয় না: ভিন্ন প্রশ্নে ভিন্ন কলাম-সেট আসতে পারে,
+        // আর Cursor.getColumnIndex খুব সস্তা।
+        {
             String[] names = {
                     "id", "bn_name", "en_name", "sci_name", "authority",
                     "class_id", "order_id", "family_id", "group_id",
@@ -101,13 +103,13 @@ public final class Species {
                     "class_bn", "order_bn", "family_bn", "group_bn",
                     "group_en", "emoji", "color", "dangerous",
             };
-            ix = new int[names.length];
+            int[] ix = new int[names.length];
             for (int i = 0; i < names.length; i++) {
                 ix[i] = c.getColumnIndex(names[i]);
                 if (ix[i] < 0) ix[i] = 0;   // অনুপস্থিত কলাম → প্রথমটি (নিরাপদ)
             }
+            return ix;
         }
-        return ix;
     }
 
     /** কার্সরের বর্তমান সারি থেকে Species বানায় (SELECT_FULL প্রজেকশন)। */

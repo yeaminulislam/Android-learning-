@@ -20,11 +20,13 @@ import java.util.zip.GZIPInputStream;
  * ডেটাবেসটি assets-এ gzip-সংকুচিত অবস্থায় থাকে (PKDB1 হেডারসহ)। প্রথমবার
  * খোলার সময় এটি অ্যাপের নিজস্ব স্টোরেজে খুলে লেখা হয় — কোনো ইন্টারনেট লাগে না।
  *
- * PKDB1 হেডার (৪৭ বাইট):
+ * PKDB1 হেডার (৪৮ বাইট):
  *   0..4   magic   "PKDB1"
  *   5..6   version (little-endian uint16)
- *   7..14  মূল ফাইলের আকার (little-endian uint64)
- *   15..46 SHA-256 (মূল ফাইলের)
+ *   7      flags   (0 = gzip স্ট্রিম)
+ *   8..15  মূল ফাইলের আকার (little-endian uint64)
+ *   16..47 SHA-256 (মূল ফাইলের)
+ *   48…    gzip স্ট্রিম
  */
 public final class DatabaseManager {
 
@@ -35,7 +37,7 @@ public final class DatabaseManager {
     public static final String EXPECTED_VERSION = "3";
 
     private static final byte[] MAGIC = {'P', 'K', 'D', 'B', '1'};
-    private static final int HEADER = 47;
+    private static final int HEADER = 48;
     private static final int BUF = 256 * 1024;
 
     public interface Progress {
@@ -140,9 +142,27 @@ public final class DatabaseManager {
                 boolean ok = true;
                 for (int i = 0; i < 5; i++) if (head[i] != MAGIC[i]) ok = false;
                 if (ok) {
-                    expected = readLong(head, 7);
+                    expected = readLong(head, 8);
                     wantHash = new byte[32];
-                    System.arraycopy(head, 15, wantHash, 0, 32);
+                    System.arraycopy(head, 16, wantHash, 0, 32);
+                    // নিরাপত্তা: gzip ম্যাজিক (1f 8b) না পাওয়া পর্যন্ত সামনের
+                    // অতিরিক্ত বাইট বাদ দেওয়া হয় (ভবিষ্যতের হেডার-বদলের বিরুদ্ধে)।
+                    byte[] two = new byte[2];
+                    int guard = 0;
+                    while (guard++ < 16) {
+                        int read = 0;
+                        while (read < 2) {
+                            int n = raw.read(two, read, 2 - read);
+                            if (n < 0) break;
+                            read += n;
+                        }
+                        if (read < 2) break;
+                        if ((two[0] & 0xFF) == 0x1f && (two[1] & 0xFF) == 0x8b) {
+                            raw = new java.io.PushbackInputStream(raw, 2);
+                            ((java.io.PushbackInputStream) raw).unread(two, 0, 2);
+                            break;
+                        }
+                    }
                 }
             } else {
                 // হেডার নেই — পুরো ফাইলই gzip ধরে নিই

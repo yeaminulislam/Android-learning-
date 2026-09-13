@@ -504,30 +504,37 @@ def write_meta(conn, inserted, nc, total):
 def compress_db(db_path, dbz_path):
     """PKDB1 হেডার + gzip স্ট্রিম লেখে।
 
-    হেডার (৪+২+৮+৩২ = ৪৬ বাইট):
-        magic   4s  b'PKDB1'
-        version H   1
-        raw_len Q   মূল ফাইলের আকার
-        sha256  32s মূল ফাইলের হ্যাশ
+    হেডার (৫+২+১+৮+৩২ = ৪৮ বাইট, অ্যাপের DatabaseManager-এর সঙ্গে হুবহু মিল):
+        0..4    magic   5s  b'PKDB1'
+        5..6    version H   1
+        7       flags   B   0 = gzip স্ট্রিম
+        8..15   raw_len Q   মূল ফাইলের আকার (little-endian)
+        16..47  sha256  32s মূল ফাইলের হ্যাশ
+    gzip স্ট্রিম শুরু হয় ঠিক ৪৮ নম্বর বাইটে।
     """
     h = hashlib.sha256()
     size = 0
-    with open(db_path, "rb") as fin, \
-            gzip.GzipFile(filename="", mode="wb", fileobj=open(dbz_path, "wb"),
-                          compresslevel=9) as gz:
+    tmp = dbz_path + ".body"
+    with open(db_path, "rb") as fin, open(tmp, "wb") as fout:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=fout,
+                           compresslevel=9, mtime=0) as gz:
+            while True:
+                blk = fin.read(1 << 20)
+                if not blk:
+                    break
+                h.update(blk)
+                size += len(blk)
+                gz.write(blk)
+    header = MAGIC + struct.pack("<HBQ", 1, 0, size) + h.digest()
+    assert len(header) == 48, len(header)
+    with open(tmp, "rb") as fin, open(dbz_path, "wb") as fout:
+        fout.write(header)
         while True:
             blk = fin.read(1 << 20)
             if not blk:
                 break
-            h.update(blk)
-            size += len(blk)
-            gz.write(blk)
-    with open(dbz_path, "rb") as f:
-        body = f.read()
-    header = MAGIC + struct.pack("<HQ", 1, size) + h.digest()
-    with open(dbz_path, "wb") as f:
-        f.write(header)
-        f.write(body)
+            fout.write(blk)
+    os.remove(tmp)
     return size, h.hexdigest()
 
 

@@ -222,7 +222,8 @@ public final class Repository {
     /** প্রথম পৃষ্ঠা। */
     public Page page(int mode, String groupId, String classId, String orderId,
                      String familyId) {
-        return pageAfter(mode, groupId, classId, orderId, familyId, 0, 0, false, null);
+        return pageAfter(mode, groupId, classId, orderId, familyId, 0, 0,
+                mode == MODE_POPULAR, null);
     }
 
     /**

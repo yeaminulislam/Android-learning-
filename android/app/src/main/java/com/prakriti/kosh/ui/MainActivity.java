@@ -111,9 +111,13 @@ public class MainActivity extends BaseActivity {
         Ui.elevate(card, Ui.dp(this, 3f));
         Ui.pad(card, Ui.dp(this, 20), Ui.dp(this, 20), Ui.dp(this, 20), Ui.dp(this, 20));
 
+        // উপরের সারি: শিরোনাম + ডানে একটি নমুনা ছবি
+        LinearLayout top = Ui.hbox(this);
+        card.addView(top, Ui.lp(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
         LinearLayout text = Ui.vbox(this);
-        card.addView(text, Ui.lpw(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        top.addView(text, Ui.lpw(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
         TextView t1 = Ui.text(this, "পৃথিবীর জীবজগৎ", 15f, Ui.withAlpha(Color.WHITE, 210), false);
         text.addView(t1);
@@ -121,6 +125,16 @@ public class MainActivity extends BaseActivity {
         TextView t2 = Ui.text(this, Ui.humanCount(totalCount) + " প্রজাতি", 30f, Color.WHITE, true);
         Ui.margins(t2, 0, Ui.dp(this, 2), 0, 0);
         text.addView(t2);
+
+        if (!popular.isEmpty()) {
+            FrameLayout artBox = new FrameLayout(this);
+            artBox.setBackground(Ui.rounded(Ui.withAlpha(Color.WHITE, 40), 16, this));
+            ArtView art = new ArtView(this);
+            art.setSpecies(popular.get(0), 1, false);
+            artBox.addView(art, new FrameLayout.LayoutParams(Ui.dp(this, 92), Ui.dp(this, 92)));
+            Ui.margins(artBox, Ui.dp(this, 12), 0, 0, 0);
+            top.addView(artBox, Ui.lp(Ui.dp(this, 92), Ui.dp(this, 92)));
+        }
 
         TextView t3 = Ui.text(this, "বাংলা নাম, ইংরেজি নাম, বৈজ্ঞানিক নাম, বাসস্থান, খাদ্য,"
                 + " প্রজনন, আকার ও বিষাক্ততা — সব কিছু এক জায়গায়, সম্পূর্ণ অফলাইনে।",
@@ -145,18 +159,6 @@ public class MainActivity extends BaseActivity {
         });
         text.addView(search);
 
-        // ডান পাশের ছবি
-        if (!popular.isEmpty()) {
-            FrameLayout artBox = new FrameLayout(this);
-            GradientDrawable ab = Ui.rounded(Ui.withAlpha(Color.WHITE, 40), 16, this);
-            artBox.setBackground(ab);
-            ArtView art = new ArtView(this);
-            art.setSpecies(popular.get(0), 1, false);
-            artBox.addView(art, new FrameLayout.LayoutParams(Ui.dp(this, 96), Ui.dp(this, 96)));
-            FrameLayout.LayoutParams p = Ui.flp(Ui.dp(this, 100), Ui.dp(this, 100),
-                    Gravity.TOP | Gravity.END);
-            card.addView(artBox, p);
-        }
         return card;
     }
 
