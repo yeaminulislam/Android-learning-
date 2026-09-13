@@ -32,6 +32,12 @@ bash tools/start_all.sh --serve  # শুধু সার্ভার (APK আ�
 
 ## 📥 APK কোথায় পাবেন
 
+**সবচেয়ে সহজ — পুরো রিপোর ZIP (৮১ MB, ভেতরে `dist/` ফোল্ডারে দুটি APK):**
+
+```
+https://codeload.github.com/yeaminulislam/Android-learning-/zip/refs/heads/arena/01a095b8-android-learning
+```
+
 **GitHub রিলিজ (নির্দেশিকাসহ):** https://github.com/yeaminulislam/Android-learning-/releases/tag/v1.0
 
 ফাইল দুটি রিপোজিটরির `dist/` ফোল্ডারে কমিট করা আছে — GitHub-এ ফাইলটি খুলে
