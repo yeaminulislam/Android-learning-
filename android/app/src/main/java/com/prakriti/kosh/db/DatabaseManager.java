@@ -107,6 +107,16 @@ public final class DatabaseManager {
             if (par != null && !par.exists()) par.mkdirs();
 
             long total = assetSize(c);
+            if (total <= 0) {
+                throw new IOException("অ্যাপের ভেতরে ডেটাবেস (assets/" + ASSET
+                        + ") পাওয়া যায়নি — APK সম্ভবত অসম্পূর্ণ নামছে");
+            }
+            long free = c.getFilesDir().getUsableSpace();
+            if (free > 0 && free < total * 5) {   // খোলা ডেটাবেস সংকুচিত ফাইলের ~৫ গুণ
+                throw new IOException("ফোনে জায়গা কম: মুক্ত "
+                        + (free / (1024 * 1024)) + " মেগাবাইট, দরকার প্রায় "
+                        + (total * 5 / (1024 * 1024)) + " মেগাবাইট। জায়গা খালি করে আবার চেষ্টা করুন।");
+            }
             if (progress != null) progress.onProgress(0, "সংরক্ষণাগার খোলা হচ্ছে…");
             extract(c, tmp, total, progress);
 
@@ -284,8 +294,8 @@ public final class DatabaseManager {
                 : SQLiteDatabase.openOrCreateDatabase(f, null);
         // কর্মক্ষমতা: বড় ক্যাশ, mmap
         try {
-            db.execSQL("PRAGMA cache_size = -12000");
-            db.execSQL("PRAGMA mmap_size = 134217728");
+            db.execSQL("PRAGMA cache_size = -8000");        // ৮ মেগাবাইট পাতা-ক্যাশ
+            db.execSQL("PRAGMA mmap_size = 67108864");       // ৬৪ মেগাবাইট mmap
             db.execSQL("PRAGMA temp_store = MEMORY");
         } catch (Exception ignored) {
             // পুরোনো Android-এ সব PRAGMA নাও চলতে পারে

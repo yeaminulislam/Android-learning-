@@ -83,6 +83,15 @@ public class SettingsActivity extends BaseActivity {
                         confirmRebuild();
                     }
                 }));
+        body.addView(row("\ud83e\ude7a", "রোগ-নির্ণয়",
+                "ডিভাইস, ডেটাবেস ও অনুসন্ধান পরীক্ষা — সমস্যা হলে এখান থেকে প্রতিবেদন পাঠান",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new android.content.Intent(SettingsActivity.this,
+                                DiagnosticsActivity.class));
+                    }
+                }));
 
         // আমার ডেটা
         body.addView(section(getString(R.string.settings_my_data)));

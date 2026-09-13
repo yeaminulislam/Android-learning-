@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,8 +28,46 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        build();
-        start();
+        try {
+            build();
+            String boot = PrakritiApp.get() == null ? "" : PrakritiApp.get().bootError();
+            if (boot != null && boot.length() > 0) {
+                // Application.onCreate ব্যর্থ হয়েছিল — চুপচাপ বন্ধ না হয়ে সেটি দেখাই
+                fail("অ্যাপ শুরু হতে সমস্যা হয়েছে\n" + boot
+                        + "\n\nবিস্তারিত দেখতে ও পাঠাতে নিচের বোতামে চাপুন।");
+                return;
+            }
+            start();
+        } catch (Throwable t) {
+            try {
+                com.prakriti.kosh.util.CrashGuard.guard(this, "SplashActivity.onCreate", t);
+            } catch (Throwable ignored) {
+                fail(t.toString());
+            }
+        }
+    }
+
+    /** প্রস্তুতি ব্যর্থ হলে স্ক্রিনেই বার্তা + রোগ-নির্ণয় বোতাম (চুপচাপ বন্ধ নয়)। */
+    private void fail(final String message) {
+        label.setText(message);
+        bar.setProgress(0);
+        TextView diag = new TextView(this);
+        diag.setText("\ud83e\ude7a রোগ-নির্ণয় খুলুন");
+        diag.setTextColor(Color.WHITE);
+        diag.setTextSize(14f);
+        diag.setGravity(Gravity.CENTER);
+        diag.setTypeface(Typeface.DEFAULT_BOLD);
+        diag.setBackground(Ui.pill(Ui.withAlpha(Color.WHITE, 60), this));
+        Ui.pad(diag, Ui.dp(this, 22), Ui.dp(this, 13), Ui.dp(this, 22), Ui.dp(this, 13));
+        Ui.margins2(diag, Ui.dp(this, 40), Ui.dp(this, 22), Ui.dp(this, 40), 0);
+        diag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SplashActivity.this, DiagnosticsActivity.class));
+            }
+        });
+        ((ViewGroup) label.getParent()).addView(diag, Ui.lp(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     private TextView label;
@@ -114,8 +153,7 @@ public class SplashActivity extends Activity {
             @Override
             public void onReady(boolean ok, String error) {
                 if (!ok) {
-                    label.setText(getString(R.string.prep_failed) + "\n" + error);
-                    bar.setProgress(0);
+                    fail(getString(R.string.prep_failed) + "\n" + error);
                     return;
                 }
                 boolean seen = app.prefs().prefBool("intro_seen", false);

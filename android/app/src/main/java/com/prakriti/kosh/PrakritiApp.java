@@ -9,6 +9,8 @@ import com.prakriti.kosh.db.Repository;
 import com.prakriti.kosh.db.UserStore;
 import com.prakriti.kosh.util.ArtView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,6 +34,8 @@ public class PrakritiApp extends Application {
     private final AtomicBoolean preparing = new AtomicBoolean(false);
     private final AtomicBoolean ready = new AtomicBoolean(false);
     private volatile String lastError = "";
+    private volatile String bootError = "";
+    private volatile String bootTrace = "";
 
     public static PrakritiApp get() {
         return instance;
@@ -41,13 +45,40 @@ public class PrakritiApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        executor = Executors.newFixedThreadPool(3);
-        main = new Handler(Looper.getMainLooper());
-        if (DatabaseManager.isReady(this)) {
-            Repository.get().init(this);
-            UserStore.get().init(this);
-            ready.set(true);
+        // ক্র্যাশ-রক্ষী সবার আগে — নাহলে এর পরের কোনো ত্রুটি চোখেই পড়বে না।
+        try {
+            com.prakriti.kosh.util.CrashGuard.install(getApplicationContext());
+        } catch (Throwable ignored) {
         }
+        bootError = "";
+        try {
+            executor = Executors.newFixedThreadPool(3);
+            main = new Handler(Looper.getMainLooper());
+            if (DatabaseManager.isReady(this)) {
+                Repository.get().init(this);
+                UserStore.get().init(this);
+                ready.set(true);
+            }
+        } catch (Throwable t) {
+            // Application.onCreate-এ ছাড়া পেলে পুরো প্রক্রিয়া মারা যায় — অ্যাপ খুলেই
+            // বন্ধ হয়ে যেত, কোনো বার্তা ছাড়াই। তাই ত্রুটিটি ধরে রাখি; স্প্ল্যাশ
+            // পর্দা দেখাতে পারলে সেখানে দেখানো হবে, নাহলে ক্র্যাশ-পর্দা দেখাবে।
+            bootError = t.getClass().getName() + ": " + t.getMessage();
+            StringWriter sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            bootTrace = sw.toString();
+            if (executor == null) executor = Executors.newFixedThreadPool(2);
+            if (main == null) main = new Handler(Looper.getMainLooper());
+        }
+    }
+
+    /** Application.onCreate-এ কোনো ত্রুটি হয়েছিল কি না। */
+    public String bootError() {
+        return bootError == null ? "" : bootError;
+    }
+
+    public String bootTrace() {
+        return bootTrace == null ? "" : bootTrace;
     }
 
     /** ব্যাকগ্রাউন্ড কাজ (ডেটাবেস পড়া, প্রস্তুত করা)। */

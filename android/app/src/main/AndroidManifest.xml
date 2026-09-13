@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.prakriti.kosh"
-    android:versionCode="1"
-    android:versionName="1.0">
+    android:versionCode="2"
+    android:versionName="1.0.1">
 
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
 
@@ -69,6 +69,22 @@
             android:name=".ui.SettingsActivity"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity" />
+
+
+        <!-- ক্র্যাশ হলে স্ট্যাক-ট্রেসসহ প্রতিবেদন দেখানোর পর্দা (নিজেদেরই বানানো,
+             যাতে অ্যাপ চুপচাপ বন্ধ হয়ে না যায়) -->
+        <activity
+            android:name=".util.CrashActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.prakriti.kosh.crash"
+            android:theme="@style/Theme.Prakriti" />
+
+        <activity
+            android:name=".ui.DiagnosticsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.SettingsActivity" />
 
     </application>
 </manifest>

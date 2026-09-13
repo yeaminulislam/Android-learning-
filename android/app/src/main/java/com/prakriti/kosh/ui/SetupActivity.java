@@ -90,13 +90,16 @@ public class SetupActivity extends Activity {
         pager.addView(track, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         root.addView(pager, Ui.lpw(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
-        pager.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int x, int y, int oldX, int oldY) {
-                handler.removeCallbacks(snap);
-                handler.postDelayed(snap, 160);
-            }
-        });
+        // View.setOnScrollChangeListener API 23 থেকে; minSdk 21, তাই
+        // ViewTreeObserver.OnScrollChangedListener ব্যবহার করা হয়েছে (API 1 থেকে আছে)।
+        pager.getViewTreeObserver().addOnScrollChangedListener(
+                new android.view.ViewTreeObserver.OnScrollChangedListener() {
+                    @Override
+                    public void onScrollChanged() {
+                        handler.removeCallbacks(snap);
+                        handler.postDelayed(snap, 160);
+                    }
+                });
 
         dots = Ui.hbox(this);
         dots.setGravity(Gravity.CENTER);

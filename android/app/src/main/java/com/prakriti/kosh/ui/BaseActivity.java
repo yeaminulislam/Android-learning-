@@ -64,120 +64,127 @@ public abstract class BaseActivity extends Activity {
 
     private int toolbarColor = -1;
     private boolean dbReady;
+    /** onCreate ব্যর্থ হলে true — পরের ধাপগুলো আর ভাঙা ভিউ নিয়ে চলে না। */
+    protected boolean uiBroken = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = PrakritiApp.get();
-        if (app == null) app = (PrakritiApp) getApplication();
+    try {
+            app = PrakritiApp.get();
+            if (app == null) app = (PrakritiApp) getApplication();
 
-        root = Ui.vbox(this);
-        root.setBackgroundColor(Ui.color(this, R.color.bg));
+            root = Ui.vbox(this);
+            root.setBackgroundColor(Ui.color(this, R.color.bg));
 
-        toolbar = Ui.hbox(this);
-        toolbar.setBackgroundColor(Ui.color(this, R.color.green_primary));
-        Ui.pad(toolbar, Ui.dp(this, 6), statusBarPad() + Ui.dp(this, 6),
-                Ui.dp(this, 10), Ui.dp(this, 10));
-        root.addView(toolbar, Ui.lp(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+            toolbar = Ui.hbox(this);
+            toolbar.setBackgroundColor(Ui.color(this, R.color.green_primary));
+            Ui.pad(toolbar, Ui.dp(this, 6), statusBarPad() + Ui.dp(this, 6),
+                    Ui.dp(this, 10), Ui.dp(this, 10));
+            root.addView(toolbar, Ui.lp(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        backButton = new ImageView(this);
-        backButton.setImageDrawable(arrowDrawable(Color.WHITE));
-        Ui.pad(backButton, Ui.dp(this, 10), Ui.dp(this, 10), Ui.dp(this, 10), Ui.dp(this, 10));
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-        toolbar.addView(backButton, Ui.lp(Ui.dp(this, 40), Ui.dp(this, 40)));
+            backButton = new ImageView(this);
+            backButton.setImageDrawable(arrowDrawable(Color.WHITE));
+            Ui.pad(backButton, Ui.dp(this, 10), Ui.dp(this, 10), Ui.dp(this, 10), Ui.dp(this, 10));
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+            toolbar.addView(backButton, Ui.lp(Ui.dp(this, 40), Ui.dp(this, 40)));
 
-        LinearLayout titles = Ui.vbox(this);
-        toolbar.addView(titles, Ui.lpw(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            LinearLayout titles = Ui.vbox(this);
+            toolbar.addView(titles, Ui.lpw(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        titleView = new TextView(this);
-        titleView.setTextColor(Color.WHITE);
-        titleView.setTextSize(18.5f);
-        titleView.setTypeface(Typeface.DEFAULT_BOLD);
-        titleView.setSingleLine(true);
-        titleView.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        titles.addView(titleView);
+            titleView = new TextView(this);
+            titleView.setTextColor(Color.WHITE);
+            titleView.setTextSize(18.5f);
+            titleView.setTypeface(Typeface.DEFAULT_BOLD);
+            titleView.setSingleLine(true);
+            titleView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            titles.addView(titleView);
 
-        subtitleView = new TextView(this);
-        subtitleView.setTextColor(Ui.withAlpha(Color.WHITE, 205));
-        subtitleView.setTextSize(12f);
-        subtitleView.setSingleLine(true);
-        subtitleView.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        subtitleView.setVisibility(View.GONE);
-        titles.addView(subtitleView);
+            subtitleView = new TextView(this);
+            subtitleView.setTextColor(Ui.withAlpha(Color.WHITE, 205));
+            subtitleView.setTextSize(12f);
+            subtitleView.setSingleLine(true);
+            subtitleView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            subtitleView.setVisibility(View.GONE);
+            titles.addView(subtitleView);
 
-        actions = Ui.hbox(this);
-        toolbar.addView(actions, Ui.lp(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+            actions = Ui.hbox(this);
+            toolbar.addView(actions, Ui.lp(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        chipScroll = new HorizontalScrollView(this);
-        chipScroll.setHorizontalScrollBarEnabled(false);
-        chipScroll.setBackgroundColor(Ui.color(this, R.color.surface));
-        chipBar = Ui.hbox(this);
-        Ui.pad(chipBar, Ui.dp(this, 12), Ui.dp(this, 8), Ui.dp(this, 12), Ui.dp(this, 8));
-        chipScroll.addView(chipBar);
-        chipScroll.setVisibility(View.GONE);
-        root.addView(chipScroll, Ui.lp(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+            chipScroll = new HorizontalScrollView(this);
+            chipScroll.setHorizontalScrollBarEnabled(false);
+            chipScroll.setBackgroundColor(Ui.color(this, R.color.surface));
+            chipBar = Ui.hbox(this);
+            Ui.pad(chipBar, Ui.dp(this, 12), Ui.dp(this, 8), Ui.dp(this, 12), Ui.dp(this, 8));
+            chipScroll.addView(chipBar);
+            chipScroll.setVisibility(View.GONE);
+            root.addView(chipScroll, Ui.lp(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        content = new FrameLayout(this);
-        root.addView(content, Ui.lpw(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+            content = new FrameLayout(this);
+            root.addView(content, Ui.lpw(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
-        progressOverlay = Ui.vbox(this);
-        progressOverlay.setBackgroundColor(Ui.color(this, R.color.green_dark));
-        progressOverlay.setClickable(true);
-        progressOverlay.setVisibility(View.GONE);
-        ((LinearLayout) progressOverlay).setGravity(Gravity.CENTER);
+            progressOverlay = Ui.vbox(this);
+            progressOverlay.setBackgroundColor(Ui.color(this, R.color.green_dark));
+            progressOverlay.setClickable(true);
+            progressOverlay.setVisibility(View.GONE);
+            ((LinearLayout) progressOverlay).setGravity(Gravity.CENTER);
 
-        TextView logo = new TextView(this);
-        logo.setText("\ud83c\udf3f");
-        logo.setTextSize(44f);
-        logo.setGravity(Gravity.CENTER);
-        ((LinearLayout) progressOverlay).addView(logo);
+            TextView logo = new TextView(this);
+            logo.setText("\ud83c\udf3f");
+            logo.setTextSize(44f);
+            logo.setGravity(Gravity.CENTER);
+            ((LinearLayout) progressOverlay).addView(logo);
 
-        TextView appName = new TextView(this);
-        appName.setText(getString(R.string.app_name));
-        appName.setTextColor(Color.WHITE);
-        appName.setTextSize(24f);
-        appName.setTypeface(Typeface.DEFAULT_BOLD);
-        appName.setGravity(Gravity.CENTER);
-        Ui.margins2(appName, 0, Ui.dp(this, 6), 0, 0);
-        ((LinearLayout) progressOverlay).addView(appName);
+            TextView appName = new TextView(this);
+            appName.setText(getString(R.string.app_name));
+            appName.setTextColor(Color.WHITE);
+            appName.setTextSize(24f);
+            appName.setTypeface(Typeface.DEFAULT_BOLD);
+            appName.setGravity(Gravity.CENTER);
+            Ui.margins2(appName, 0, Ui.dp(this, 6), 0, 0);
+            ((LinearLayout) progressOverlay).addView(appName);
 
-        progressLabel = new TextView(this);
-        progressLabel.setText(getString(R.string.prep_first_run));
-        progressLabel.setTextColor(Ui.withAlpha(Color.WHITE, 210));
-        progressLabel.setTextSize(13.5f);
-        progressLabel.setGravity(Gravity.CENTER);
-        Ui.margins2(progressLabel, Ui.dp(this, 28), Ui.dp(this, 18), Ui.dp(this, 28), 0);
-        ((LinearLayout) progressOverlay).addView(progressLabel);
+            progressLabel = new TextView(this);
+            progressLabel.setText(getString(R.string.prep_first_run));
+            progressLabel.setTextColor(Ui.withAlpha(Color.WHITE, 210));
+            progressLabel.setTextSize(13.5f);
+            progressLabel.setGravity(Gravity.CENTER);
+            Ui.margins2(progressLabel, Ui.dp(this, 28), Ui.dp(this, 18), Ui.dp(this, 28), 0);
+            ((LinearLayout) progressOverlay).addView(progressLabel);
 
-        progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
-        progressBar.setMax(100);
-        Ui.margins2(progressBar, Ui.dp(this, 40), Ui.dp(this, 10), Ui.dp(this, 40), 0);
-        ((LinearLayout) progressOverlay).addView(progressBar,
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        Ui.dp(this, 6)));
+            progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+            progressBar.setMax(100);
+            Ui.margins2(progressBar, Ui.dp(this, 40), Ui.dp(this, 10), Ui.dp(this, 40), 0);
+            ((LinearLayout) progressOverlay).addView(progressBar,
+                    new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            Ui.dp(this, 6)));
 
-        TextView sizeHint = new TextView(this);
-        sizeHint.setTextColor(Ui.withAlpha(Color.WHITE, 165));
-        sizeHint.setTextSize(11.5f);
-        sizeHint.setGravity(Gravity.CENTER);
-        Ui.margins2(sizeHint, Ui.dp(this, 28), Ui.dp(this, 8), Ui.dp(this, 28), 0);
-        ((LinearLayout) progressOverlay).addView(sizeHint);
+            TextView sizeHint = new TextView(this);
+            sizeHint.setTextColor(Ui.withAlpha(Color.WHITE, 165));
+            sizeHint.setTextSize(11.5f);
+            sizeHint.setGravity(Gravity.CENTER);
+            Ui.margins2(sizeHint, Ui.dp(this, 28), Ui.dp(this, 8), Ui.dp(this, 28), 0);
+            ((LinearLayout) progressOverlay).addView(sizeHint);
 
-        root.addView(progressOverlay, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            root.addView(progressOverlay, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        setContentView(root);
-        long assetMb = DatabaseManager.assetSize(this) / (1024L * 1024L);
-        sizeHint.setText("প্রথমবার শুধু একবার — " + Ui.bnDigits(assetMb)
-                + " মেগাবাইট সংরক্ষণাগার খোলা হবে। ইন্টারনেট লাগবে না।");
+            setContentView(root);
+            long assetMb = DatabaseManager.assetSize(this) / (1024L * 1024L);
+            sizeHint.setText("প্রথমবার শুধু একবার — " + Ui.bnDigits(assetMb)
+                    + " মেগাবাইট সংরক্ষণাগার খোলা হবে। ইন্টারনেট লাগবে না।");
+    } catch (Throwable t) {
+        uiBroken = true;
+        com.prakriti.kosh.util.CrashGuard.guard(this, "onCreate", t);
+    }
     }
 
     private int statusBarPad() {
@@ -235,6 +242,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void setToolbar(String title, String subtitle) {
+        if (uiBroken || titleView == null) return;
         titleView.setText(title == null ? "" : title);
         if (subtitle == null || subtitle.length() == 0) {
             subtitleView.setVisibility(View.GONE);
@@ -245,6 +253,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void setToolbarColor(int color) {
+        if (uiBroken || toolbar == null) return;
         toolbarColor = color;
         toolbar.setBackgroundColor(color);
         int on = Ui.readableOn(color);
@@ -259,16 +268,19 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void showBack(boolean show) {
+        if (uiBroken || backButton == null) return;
         backButton.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /** টুলবারের সব অ্যাকশন মুছে দেয় (স্ক্রিন নতুন করে সাজাতে)। */
     public void clearToolbarActions() {
+        if (uiBroken || actions == null) return;
         actions.removeAllViews();
     }
 
     /** টুলবারে টেক্সট-অ্যাকশন যোগ করে। */
     public TextView addToolbarAction(String label, View.OnClickListener l) {
+        if (uiBroken || actions == null) return null;
         TextView t = new TextView(this);
         t.setText(label);
         t.setTextColor(toolbarColor == -1 ? Color.WHITE : Ui.readableOn(toolbarColor));
@@ -285,6 +297,7 @@ public abstract class BaseActivity extends Activity {
 
     /** টুলবারে খোঁজার আইকন (\ud83d\udd0e) যোগ করে। */
     public void addSearchAction() {
+        if (uiBroken || actions == null) return;
         TextView t = new TextView(this);
         t.setText("\ud83d\udd0e");
         t.setTextSize(16f);
@@ -301,6 +314,7 @@ public abstract class BaseActivity extends Activity {
 
     /** টুলবারে সেটিংস আইকন যোগ করে। */
     public void addSettingsAction() {
+        if (uiBroken || actions == null) return;
         TextView t = new TextView(this);
         t.setText("⚙");
         t.setTextSize(17f);
@@ -317,6 +331,7 @@ public abstract class BaseActivity extends Activity {
 
     /** স্ক্রিনের মূল কন্টেন্ট বসায়। */
     public void setContent(View v) {
+        if (uiBroken || content == null) return;
         content.removeAllViews();
         if (v != null) {
             content.addView(v, new FrameLayout.LayoutParams(
@@ -331,12 +346,14 @@ public abstract class BaseActivity extends Activity {
     // ------------------------------------------------------------ চিপ বার
 
     public void clearChips() {
+        if (uiBroken || chipBar == null) return;
         chipBar.removeAllViews();
         chipScroll.setVisibility(chipBar.getChildCount() > 0 ? View.VISIBLE : View.GONE);
     }
 
     /** একটি চিপ যোগ করে; শেষে চিপ-বার দেখায়। */
     public TextView addChip(String label, boolean selected, View.OnClickListener l) {
+        if (uiBroken || chipBar == null) return null;
         TextView t = new TextView(this);
         t.setText(label);
         t.setTextSize(12.5f);
@@ -366,6 +383,11 @@ public abstract class BaseActivity extends Activity {
     }
 
     protected final void requireDb() {
+        if (uiBroken) return;
+        if (app == null) {
+            app = PrakritiApp.get();
+            if (app == null) app = (PrakritiApp) getApplication();
+        }
         if (app.isReady() || DatabaseManager.isReady(this)) {
             dbReady = true;
             onDbReady();
