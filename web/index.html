@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>প্রকৃতি কোষ — অফলাইন জীববৈচিত্র্য অ্যাপ (UI প্রোটোটাইপ)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <div class="statusbar">
+    <span id="clock">৯:৪১</span>
+    <span>প্রকৃতি কোষ · অফলাইন &nbsp;📶 🔋</span>
+  </div>
+  <div class="toolbar" id="toolbar"></div>
+  <div class="chipbar" id="chipbar" style="display:none"></div>
+  <div class="screen pad" id="screen"></div>
+</div>
+
+<aside class="aside">
+  <h2>প্রকৃতি কোষ</h2>
+  <div class="sub">
+    সম্পূর্ণ অফলাইন অ্যান্ড্রয়েড অ্যাপ — ২,৫০,০০০ প্রজাতির বাংলা বিশ্বকোষ।
+    এটি সেই অ্যাপের হুবহু নকশা দেখানোর জন্য ব্রাউজার-প্রোটোটাইপ; নিচের বোতাম দিয়ে
+    প্রতিটি স্ক্রিন ঘুরে দেখুন।
+  </div>
+  <div class="nav" id="screenNav"></div>
+  <div class="facts">
+    <h3>এই স্ক্রিনে যা ঘটছে</h3>
+    <div id="screenInfo" style="font-size:13px;line-height:1.75;color:#3c4c3a"></div>
+  </div>
+  <div class="facts" style="margin-top:14px">
+    <h3>কারিগরি নকশা</h3>
+    <ul style="padding-left:18px;margin:0">
+      <li>ডেটা: SQLite — ২,৫০,০০০ সারি, ৪৩১ মেগাবাইট; সংকুচিত ৭৫.৯ মেগাবাইট APK-র ভেতরে।</li>
+      <li>সূচক: FTS5 পূর্ণ-পাঠ + <code>bn_name</code>, <code>lower(en_name)</code>, <code>lower(sci_name)</code> এক্সপ্রেশন ইনডেক্স।</li>
+      <li>পেজিনেশন: কীসেট (<code>row_seq &gt; ?</code>) — ২৪টি করে সারি, OFFSET নয়।</li>
+      <li>ছবি: প্রোগ্রামে আঁকা ভেক্টর সিলুয়েট — কোনো ছবি-ফাইল নেই, তাই নেটওয়ার্ক খরচ শূন্য।</li>
+      <li>সব ডেটাবেস-কাজ ব্যাকগ্রাউন্ড থ্রেডে; স্ক্রিনে শুধু দৃশ্যমান সারিই মেমরিতে।</li>
+      <li>কোনো ইন্টারনেট অনুমতি নেই — ম্যানিফেস্টে শুধু অফলাইন ডেটা।</li>
+    </ul>
+  </div>
+</aside>
+
+<script src="art.js"></script>
+<script src="app.js"></script>
+<script>
+  // স্ট্যাটাস-বারের ঘড়ি
+  (function () {
+    function tick() {
+      const d = new Date();
+      const bnDigits = (n) => String(n).replace(/\d/g, (x) => '০১২৩৪৫৬৭৮৯'[+x]);
+      let h = d.getHours() % 12 || 12;
+      document.getElementById('clock').textContent =
+        bnDigits(h) + ':' + bnDigits(String(d.getMinutes()).padStart(2, '0'));
+    }
+    tick(); setInterval(tick, 20000);
+  })();
+</script>
+</body>
+</html>
