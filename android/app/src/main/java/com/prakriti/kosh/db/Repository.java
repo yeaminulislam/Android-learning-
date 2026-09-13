@@ -41,7 +41,7 @@ public final class Repository {
             + " s.class_id, s.order_id, s.family_id, s.group_id,"
             + " s.region_bn, s.habitat_bn, s.diet_bn, s.iucn, s.size_bn,"
             + " s.venom_level, s.venom_bn, s.repro_bn, s.fact_bn, s.extinct_bn,"
-            + " s.notes_bn, s.is_demo, s.popularity, s.row_seq, s.extinct";
+            + " s.notes_bn, s.is_demo, s.popularity, s.row_seq, s.extinct,";
 
     public static final String JOIN_TAXONOMY =
             " LEFT JOIN taxon_class tc ON tc.group_id = s.group_id"

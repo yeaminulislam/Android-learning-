@@ -116,6 +116,11 @@ print(f"  ✓ ডেমো: {st['species_total']} প্রজাতি, {st['as
 PY
 fi
 
+# ── ৩গ. SQL পরীক্ষা (ডিভাইসে যাওয়ার আগেই) ────────────────────
+say "৩গ. Repository.java-র সব SQL আসল ডেটাবেসে কম্পাইল হচ্ছে কি না"
+python3 "$ROOT/tools/test_sql.py" "$ROOT/data/dist/prakriti_kosh.db" | tail -1 || exit 1
+python3 "$ROOT/tools/test_sql.py" "$ROOT/data/dist-demo/prakriti_kosh.db" | tail -1 || exit 1
+
 # ── ৪. APK বিল্ড ─────────────────────────────────────────────
 say "৪. APK বিল্ড (ডেমো → সম্পূর্ণ)"
 cd "$ROOT"
@@ -126,9 +131,13 @@ JAVA_BIN="$JAVA_BIN" TOOLS_DIR="$TOOLS_DIR/node_modules/@drxiaozhi/minapk/tools"
   AAPT2_BIN="$AAPT2" ASSETS_DIR="$ASSETS" \
   APK_NAME=prakriti-kosh.apk bash tools/build_apk.sh || exit 1
 
+say "৪খ. ডায়াগনস্টিক APK (install-test.apk — ইনস্টল পরীক্ষার জন্য)"
+JAVA_BIN="$JAVA_BIN" TOOLS_DIR="$TOOLS_DIR/node_modules/@drxiaozhi/minapk/tools" \
+  AAPT2_BIN="$AAPT2" bash tools/build_diag.sh || exit 1
+
 # ── ৫. স্বাক্ষর যাচাই + সার্ভার ────────────────────────────────
 say "৫. স্বাক্ষর যাচাই"
-for f in dist/prakriti-kosh-demo.apk dist/prakriti-kosh.apk; do
+for f in dist/install-test.apk dist/prakriti-kosh-demo.apk dist/prakriti-kosh.apk; do
   "$JAVA_BIN" -jar "$TOOLS_DIR/node_modules/@drxiaozhi/minapk/tools/apksigner.jar" \
     verify --print-certs "$f" 2>/dev/null | head -1 | sed "s|^|  $f: |"
   sha256sum "$f" | cut -c1-46
