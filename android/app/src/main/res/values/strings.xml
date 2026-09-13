@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">প্রকৃতি কোষ</string>
+    <string name="app_tagline">২.৫ লক্ষ প্রজাতির অফলাইন বিশ্বকোষ</string>
+    <string name="search_hint">প্রাণী, উদ্ভিদ বা বৈজ্ঞানিক নাম খুঁজুন…</string>
+    <string name="search_label">অনুসন্ধান</string>
+
+    <string name="nav_groups">বিভাগ</string>
+    <string name="nav_browse">ঘুরে দেখুন</string>
+    <string name="nav_favorites">পছন্দের তালিকা</string>
+    <string name="nav_settings">সেটিংস</string>
+
+    <string name="title_main">প্রকৃতি কোষ</string>
+    <string name="title_search">অনুসন্ধান</string>
+    <string name="title_settings">সেটিংস</string>
+    <string name="title_favorites">পছন্দের প্রজাতি</string>
+    <string name="title_threatened">বিপন্ন প্রজাতি</string>
+    <string name="title_extinct">বিলুপ্ত প্রজাতি</string>
+    <string name="title_venomous">বিষাক্ত প্রজাতি</string>
+    <string name="title_related">একই পরিবারের আরও</string>
+    <string name="title_all">সব প্রজাতি</string>
+    <string name="title_browse_popular">সবচেয়ে পরিচিত প্রজাতি</string>
+
+    <string name="prep_first_run">প্রথমবারের মতো ডেটাবেস প্রস্তুত হচ্ছে…</string>
+    <string name="prep_extract">সংরক্ষণাগার খোলা হচ্ছে…</string>
+    <string name="prep_done">প্রস্তুত!</string>
+    <string name="prep_failed">ডেটাবেস প্রস্তুত করা যায়নি</string>
+    <string name="prep_start">ডেটাবেস আবার প্রস্তুত হচ্ছে…</string>
+
+    <string name="skip">এড়িয়ে যান</string>
+    <string name="next">পরবর্তী</string>
+    <string name="get_started">শুরু করুন</string>
+
+    <string name="label_habitat">বাসস্থান ও অবস্থান</string>
+    <string name="label_diet">খাদ্য</string>
+    <string name="label_repro">প্রজনন</string>
+    <string name="label_size">আকার</string>
+    <string name="label_venom">বিষাক্ততা</string>
+    <string name="label_iucn">সংরক্ষণ অবস্থা</string>
+    <string name="label_taxonomy">শ্রেণিবিন্যাস</string>
+    <string name="label_fact">আকর্ষণীয় তথ্য</string>
+    <string name="label_extinct">বিলুপ্তি</string>
+    <string name="label_authority">প্রণেতা</string>
+    <string name="label_notes">অতিরিক্ত নোট</string>
+
+    <string name="action_search">খুঁজুন</string>
+    <string name="action_favorite">পছন্দ</string>
+    <string name="action_share">শেয়ার</string>
+    <string name="action_settings">সেটিংস</string>
+    <string name="action_back">পেছনে</string>
+
+    <string name="empty_list">কিছু পাওয়া যায়নি</string>
+    <string name="empty_favorites">এখনো কোনো প্রজাতি পছন্দ করা হয়নি</string>
+    <string name="empty_search">কোনো ফলাফল নেই — অন্য শব্দ চেষ্টা করুন</string>
+
+    <string name="settings_about">অ্যাপ সম্পর্কে</string>
+    <string name="settings_data">ডেটা</string>
+    <string name="settings_database">সংগ্রহশালা (ডেটাবেস)</string>
+    <string name="settings_my_data">আমার ডেটা</string>
+    <string name="settings_total_species">মোট প্রজাতি</string>
+    <string name="settings_fts">পূর্ণ-পাঠ সূচক (FTS5)</string>
+    <string name="settings_fts_sub">বাংলা, ইংরেজি ও বৈজ্ঞানিক নামে মিলিয়ে খোঁজে</string>
+    <string name="settings_rebuild">ডেটাবেস আবার বানান</string>
+    <string name="settings_rebuild_sub">সংরক্ষণাগার থেকে নতুন করে খোলা হবে (কয়েক সেকেন্ড)</string>
+    <string name="settings_offline">সম্পূর্ণ অফলাইন — কোনো ইন্টারনেট অনুমতি নেই</string>
+    <string name="settings_stats">সংগ্রহশালার পরিসংখ্যান</string>
+    <string name="settings_reset_favorites">পছন্দের তালিকা মুছুন</string>
+    <string name="settings_reset_notes">সব নোট মুছুন</string>
+    <string name="settings_confirm_reset">মুছে ফেলবেন?</string>
+    <string name="yes">হ্যাঁ</string>
+    <string name="no">না</string>
+    <string name="copied">কপি হয়েছে</string>
+</resources>

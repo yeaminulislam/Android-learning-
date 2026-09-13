@@ -1,0 +1,14 @@
+# বড় বিল্ড-আর্টিফ্যাক্ট git-এ রাখা হবে না
+data/dist/*.db
+data/dist/*.db.z
+build/
+data/dist/
+android/app/src/main/assets/db/*.db
+android/app/src/main/assets/db/*.db.z
+android/app/src/main/assets/db/*.json
+*.apk
+*.aab
+.gradle/
+local.properties
+__pycache__/
+*.pyc
