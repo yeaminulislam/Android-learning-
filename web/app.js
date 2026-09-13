@@ -452,14 +452,31 @@
     const captions = ['স্বাভাবিক পরিবেশ', 'রাতের বেলায়', 'সূর্যাস্তে', 'মেঘলা দিনে'];
     const cap = el('div', 'caption', captions[0]);
     const dots = el('div', 'dots');
+    // আসল ছবি (photos/<id>.webp) থাকলে গ্যালারির প্রথম পৃষ্ঠা সেটিই
+    const photoImg = new Image();
+    let hasPhoto = false;
+    let photoProbed = false;
+    photoImg.onload = () => { hasPhoto = true; photoProbed = true; paint(); };
+    photoImg.onerror = () => { hasPhoto = false; photoProbed = true; };
+    photoImg.src = 'photos/' + s.id + '.webp';
+    const pages = () => 4 + (hasPhoto ? 1 : 0);
     function paint() {
       art.innerHTML = '';
-      const c = artCanvas(s, 824, 512, variant);
-      c.style.width = '100%'; c.style.height = '100%';
-      art.appendChild(c);
-      cap.textContent = captions[variant];
+      if (hasPhoto && variant === 0) {
+        const im = photoImg.cloneNode();
+        im.style.width = '100%'; im.style.height = '100%';
+        im.style.objectFit = 'cover';
+        art.appendChild(im);
+        cap.textContent = 'আসল ছবি — সংগৃহীত';
+      } else {
+        const v = Math.max(0, variant - (hasPhoto ? 1 : 0));
+        const c = artCanvas(s, 824, 512, v);
+        c.style.width = '100%'; c.style.height = '100%';
+        art.appendChild(c);
+        cap.textContent = captions[v];
+      }
       dots.innerHTML = '';
-      for (let i = 0; i < 4; i++) dots.appendChild(el('i', i === variant ? 'on' : ''));
+      for (let i = 0; i < pages(); i++) dots.appendChild(el('i', i === variant ? 'on' : ''));
     }
     gal.appendChild(art);
     gal.appendChild(cap);
@@ -472,7 +489,7 @@
       b2.style.background = 'var(--iucn-ex)';
       gal.appendChild(b2);
     }
-    gal.onclick = () => { variant = (variant + 1) % 4; paint(); };
+    gal.onclick = () => { variant = (variant + 1) % pages(); paint(); };
     paint();
     screenEl.appendChild(gal);
 

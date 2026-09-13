@@ -51,7 +51,16 @@ def process():
     total_bytes = 0
     for r in rows:
         src = os.path.join(ROOT, r['file'])
+        out0 = os.path.join(WEBP, '%d.webp' % r['id'])
         if not os.path.exists(src):
+            # মূল ফাইল হারিয়ে গেলেও আগে বানানো WebP থাকলে সেটিই রাখি
+            if os.path.exists(out0):
+                manifest[str(r['id'])] = {'sci': r['sci'], 'source': r['source'],
+                                          'bytes': os.path.getsize(out0),
+                                          'px': None, 'reused': True}
+                ok += 1
+                total_bytes += os.path.getsize(out0)
+                continue
             print('  ! ফাইল নেই: %s' % r['file'])
             skipped += 1
             continue
