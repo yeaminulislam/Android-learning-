@@ -18,14 +18,32 @@
 
 ---
 
-## ইনস্টল
+## ডাউনলোড ও ইনস্টল
 
-```
-dist/prakriti-kosh.apk
+দুটি সংস্করণ — একই অ্যাপ, শুধু ভেতরের ডেটাবেসের আকার আলাদা:
+
+| ফাইল | আকার | প্রজাতি | ডেটাবেস |
+|---|---:|---:|---|
+| `dist/prakriti-kosh-demo.apk` | ৭.১ MB | ২০,০০০ | ৩৪ MB → ৭ MB |
+| `dist/prakriti-kosh.apk` | ৭৬ MB | ২,৫০,০০০ | ৪৩১ MB → ৭৬ MB |
+
+মোবাইল নেটে প্রথমে ছোটটি নামিয়ে দেখে নেওয়া বুদ্ধিমানের কাজ; ভালো লাগলে সম্পূর্ণটি
+নামান। দুটো একই কীতে স্বাক্ষরিত, তাই ছোটটির ওপর সম্পূর্ণটি সরাসরি আপডেট হিসেবে
+বসবে (ডেটা মুছে যাবে, কারণ ডেটাবেস বদলায়)।
+
+ছোটটি আলাদা করে বানাতে:
+
+```bash
+python3 tools/build_dataset.py --total 20000 --demo 400 \
+        --out data/dist-demo --web /tmp/demoweb
+mkdir -p /tmp/assets-demo/db
+cp data/dist-demo/prakriti_kosh.db.z /tmp/assets-demo/db/
+ASSETS_DIR=/tmp/assets-demo APK_NAME=prakriti-kosh-demo.apk bash tools/build_apk.sh
 ```
 
-ফোনটিতে ফাইলটি কপি করে ট্যাপ করলেই ইনস্টল হবে (debug-কীতে স্বাক্ষরিত;
-"অজানা উৎস" অনুমতি দিতে হতে পারে)। অথবা:
+ফোনে ব্রাউজার থেকে APK নামিয়ে ট্যাপ করলেই ইনস্টল হবে; "অজানা অ্যাপ ইনস্টল করা"
+অনুমতি চাইলে Allow দিন (debug-কীতে স্বাক্ষরিত, প্লে-স্টোরের বাইরের অ্যাপ)।
+কম্পিউটার থেকে:
 
 ```bash
 adb install -r dist/prakriti-kosh.apk

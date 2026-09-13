@@ -1,0 +1,60 @@
+{
+ "species_total": 20000,
+ "curated_total": 227,
+ "db_bytes": 34357248,
+ "by_group": {
+  "amphibians": 500,
+  "birds": 1875,
+  "dinosaurs": 912,
+  "fishes": 1797,
+  "fungi": 1372,
+  "inverts": 3631,
+  "mammals": 1626,
+  "marine": 2126,
+  "microbes": 1570,
+  "plants": 3054,
+  "reptiles": 630,
+  "viruses": 907
+ },
+ "by_iucn": {
+  "LC": 12425,
+  "NT": 1970,
+  "VU": 1808,
+  "EN": 1387,
+  "CR": 984,
+  "DD": 972,
+  "EX": 246,
+  "EW": 208
+ },
+ "by_venom": {
+  "0": 12508,
+  "1": 2990,
+  "2": 2528,
+  "3": 1516,
+  "4": 458
+ },
+ "extinct": 808,
+ "dangerous": 1974,
+ "classes": 81,
+ "orders": 349,
+ "families": 1315,
+ "regions": 180,
+ "fts_probe": {
+  "বাঘ": {
+   "hits": 27,
+   "ms": 2.25
+  },
+  "tiger": {
+   "hits": 16,
+   "ms": 0.06
+  },
+  "Panthera": {
+   "hits": 5,
+   "ms": 0.03
+  },
+  "মাছরাঙা": {
+   "hits": 107,
+   "ms": 0.21
+  }
+ }
+}

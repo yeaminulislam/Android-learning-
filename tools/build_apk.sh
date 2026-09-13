@@ -14,6 +14,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MAIN="$ROOT/android/app/src/main"
 BUILD="$ROOT/build"
 OUT="$ROOT/dist"
+ASSETS="${ASSETS_DIR:-$MAIN/assets}"          # ছোট/বড় ডেটাসেট বেছে নেওয়ার জন্য
+APK_NAME="${APK_NAME:-prakriti-kosh.apk}"
 
 JAVA="${JAVA_BIN:-/tmp/jdkenv/lib/python3.11/site-packages/jdk4py/java-runtime/bin/java}"
 TOOLS="${TOOLS_DIR:-/tmp/apktools/node_modules/@drxiaozhi/minapk/tools}"
@@ -54,14 +56,14 @@ rm -f "$BUILD/base.apk"
 
 echo "── ৬. প্যাকেজ (classes.dex + assets, STORED)"
 python3 "$ROOT/tools/pack_apk.py" "$BUILD/base.apk" "$BUILD/dex/classes.dex" \
-  "$MAIN/assets" "$BUILD/unsigned.apk"
+  "$ASSETS" "$BUILD/unsigned.apk"
 
 echo "── ৭. apksigner"
 cp "$BUILD/unsigned.apk" "$BUILD/aligned.apk"
 "$JAVA" -Xmx900m -jar "$TOOLS/apksigner.jar" sign \
   --ks "$KEYSTORE" --ks-pass pass:android --key-pass pass:android \
   --ks-key-alias androiddebugkey --v1-signing-enabled true \
-  --v2-signing-enabled true --out "$OUT/prakriti-kosh.apk" "$BUILD/aligned.apk"
-"$JAVA" -jar "$TOOLS/apksigner.jar" verify --print-certs "$OUT/prakriti-kosh.apk" | head -5
-ls -la "$OUT/prakriti-kosh.apk"
-echo "✅ APK তৈরি: $OUT/prakriti-kosh.apk"
+  --v2-signing-enabled true --out "$OUT/$APK_NAME" "$BUILD/aligned.apk"
+"$JAVA" -jar "$TOOLS/apksigner.jar" verify --print-certs "$OUT/$APK_NAME" | head -3
+ls -la "$OUT/$APK_NAME"
+echo "✅ APK তৈরি: $OUT/$APK_NAME"

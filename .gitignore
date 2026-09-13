@@ -8,6 +8,7 @@ android/app/src/main/assets/db/*.db.z
 android/app/src/main/assets/db/*.json
 *.apk
 !dist/prakriti-kosh.apk
+!dist/prakriti-kosh-demo.apk
 *.aab
 .gradle/
 local.properties
