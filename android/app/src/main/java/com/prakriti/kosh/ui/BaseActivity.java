@@ -174,7 +174,7 @@ public abstract class BaseActivity extends Activity {
             Ui.margins2(sizeHint, Ui.dp(this, 28), Ui.dp(this, 8), Ui.dp(this, 28), 0);
             ((LinearLayout) progressOverlay).addView(sizeHint);
 
-            root.addView(progressOverlay, new FrameLayout.LayoutParams(
+            root.addView(progressOverlay, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
             setContentView(root);

@@ -116,6 +116,12 @@ print(f"  ✓ ডেমো: {st['species_total']} প্রজাতি, {st['as
 PY
 fi
 
+if [ -d "$ROOT/data/photos/webp" ] && [ -s "$ROOT/data/photos/webp/1.webp" ]; then
+  say "৩ঘ. প্রজাতির আসল ছবি assets-এ বসাচ্ছি"
+  python3 "$ROOT/tools/photos_pack.py" install "$ROOT/data/dist/prakriti_kosh.db" "$ASSETS" || true
+  python3 "$ROOT/tools/photos_pack.py" install "$ROOT/data/dist-demo/prakriti_kosh.db" /tmp/assets-demo || true
+fi
+
 # ── ৩গ. SQL পরীক্ষা (ডিভাইসে যাওয়ার আগেই) ────────────────────
 say "৩গ. Repository.java-র সব SQL আসল ডেটাবেসে কম্পাইল হচ্ছে কি না"
 python3 "$ROOT/tools/test_sql.py" "$ROOT/data/dist/prakriti_kosh.db" | tail -1 || exit 1

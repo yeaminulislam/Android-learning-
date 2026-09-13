@@ -53,11 +53,28 @@ public class SearchActivity extends BaseActivity {
         }
     };
 
+    private boolean built;
+
+    /**
+     * বাগ-ফিক্স (v1.0.4): আগে এই স্ক্রিনে requireDb() কখনো ডাকা হত না —
+     * ফলে onDbReady() চলত না, খোঁজার বাক্স ও ফলের তালিকা কিছুই বসত না
+     * (স্ক্রিন ফাঁকা দেখাত)। এখন onCreate-এ requireDb() ডাকা হয়।
+     */
+    @Override
+    protected void onCreate(android.os.Bundle b) {
+        super.onCreate(b);
+        if (uiBroken) return;
+        requireDb();
+    }
+
     @Override
     protected void onDbReady() {
+        if (built) return;
+        built = true;
         setToolbar(getString(R.string.title_search), "বাংলা, ইংরেজি বা বৈজ্ঞানিক নামে খুঁজুন");
         setToolbarColor(Ui.color(this, R.color.green_dark));
         build();
+        input.requestFocus();
     }
 
     private void build() {

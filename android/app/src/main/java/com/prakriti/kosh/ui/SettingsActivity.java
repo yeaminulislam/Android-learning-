@@ -29,8 +29,23 @@ public class SettingsActivity extends BaseActivity {
     private int favCount;
     private int noteCount;
 
+    private boolean built;
+
+    /**
+     * বাগ-ফিক্স (v1.0.4): আগে requireDb() ডাকা হত না — তাই onDbReady()
+     * চলত না আর সেটিংস স্ক্রিন সম্পূর্ণ ফাঁকা দেখাত।
+     */
+    @Override
+    protected void onCreate(android.os.Bundle b) {
+        super.onCreate(b);
+        if (uiBroken) return;
+        requireDb();
+    }
+
     @Override
     protected void onDbReady() {
+        if (built) return;
+        built = true;
         setToolbar(getString(R.string.title_settings), null);
         setToolbarColor(Ui.color(this, R.color.green_dark));
         build();

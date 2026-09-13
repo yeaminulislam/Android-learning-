@@ -17,3 +17,7 @@ android/app/src/main/assets/db/*.json
 local.properties
 __pycache__/
 *.pyc
+
+# ছবির উৎস (নামানো মূল jpg/png) — git-এ নয়; webp ছোট তাই রাখা হয়
+image-search/
+data/photos/curated.tsv

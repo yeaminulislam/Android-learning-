@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.prakriti.kosh.R;
 import com.prakriti.kosh.data.Species;
+import com.prakriti.kosh.util.PhotoStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,10 @@ public class ArtPager extends FrameLayout {
     private static final String[] CAPTIONS = {
             "স্বাভাবিক পরিবেশে", "মুক্ত আকাশে", "সোনালি আলোয়", "রাতের আঁধারে"
     };
+    private static final String PHOTO_CAPTION = "আসল ছবি — সংগৃহীত";
+
+    /** assets/photos/<id>.webp থেকে আসল ছবি; না থাকলে null (আঁকা ছবিই সব)। */
+    private Bitmap photo;
 
     public ArtPager(Context c) {
         super(c);
@@ -76,7 +81,26 @@ public class ArtPager extends FrameLayout {
         inner.addView(dots, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        for (int i = 0; i < SpeciesArt.VARIANTS; i++) {
+        rebuildDots();
+        setWillNotDraw(false);
+    }
+
+    /** মোট পৃষ্ঠা = ৪টি আঁকা রূপ + (আসল ছবি থাকলে) ১টি ছবি। */
+    private int pageCount() {
+        return SpeciesArt.VARIANTS + (photo != null ? 1 : 0);
+    }
+
+    /** আসল ছবি থাকলে সেটি পৃষ্ঠা ০ — আঁকা রূপগুলো ১ থেকে শুরু। */
+    private int photoOffset() {
+        return photo != null ? 1 : 0;
+    }
+
+    /** পৃষ্ঠা-সংখ্যা অনুযায়ী নিচের বিন্দু-নির্দেশক নতুন করে বানায়। */
+    private void rebuildDots() {
+        final Context c = getContext();
+        dots.removeAllViews();
+        int pages = Math.max(1, pageCount());
+        for (int i = 0; i < pages; i++) {
             View d = new View(c);
             d.setBackground(Ui.oval(Ui.withAlpha(0xFFFFFFFF, 110)));
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(Ui.dp(c, 6), Ui.dp(c, 6));
@@ -90,7 +114,6 @@ public class ArtPager extends FrameLayout {
             });
             dots.addView(d, p);
         }
-        setWillNotDraw(false);
     }
 
     public void setOnVariantChange(OnVariantChange l) {
@@ -101,13 +124,16 @@ public class ArtPager extends FrameLayout {
         this.species = s;
         this.artW = Math.max(320, w);
         this.artH = Math.max(240, h);
+        this.photo = s == null ? null : PhotoStore.load(getContext(), s.id, 1024);
         this.variant = 0;
+        rebuildDots();
         render();
     }
 
     public void setVariant(int v) {
-        if (v < 0) v = SpeciesArt.VARIANTS - 1;
-        if (v >= SpeciesArt.VARIANTS) v = 0;
+        int pages = pageCount();
+        if (v < 0) v = pages - 1;
+        if (v >= pages) v = 0;
         if (v == variant) return;
         variant = v;
         render();
@@ -120,9 +146,19 @@ public class ArtPager extends FrameLayout {
 
     private void render() {
         if (species == null) return;
-        Bitmap b = ArtView.render(artW, artH, species, variant, false);
-        if (b != null) image.setImageBitmap(b);
-        caption.setText(CAPTIONS[variant % CAPTIONS.length]);
+        if (photo != null && variant == 0) {
+            // পৃষ্ঠা ০ — আসল ছবি (বাক্স ভরাতে CENTER_CROP)
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            image.setImageBitmap(photo);
+            caption.setText(PHOTO_CAPTION);
+        } else {
+            int artVariant = variant - photoOffset();
+            if (artVariant < 0) artVariant = 0;
+            image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            Bitmap b = ArtView.render(artW, artH, species, artVariant, false);
+            if (b != null) image.setImageBitmap(b);
+            caption.setText(CAPTIONS[artVariant % CAPTIONS.length]);
+        }
         for (int i = 0; i < dots.getChildCount(); i++) {
             View d = dots.getChildAt(i);
             d.setBackground(Ui.oval(i == variant ? Color.WHITE : Ui.withAlpha(0xFFFFFFFF, 100)));

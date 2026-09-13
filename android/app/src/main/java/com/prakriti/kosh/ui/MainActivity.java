@@ -41,6 +41,8 @@ public class MainActivity extends BaseActivity {
         setToolbar(getString(R.string.app_name), getString(R.string.app_tagline));
         setToolbarColor(Ui.color(this, R.color.green_primary));
         showBack(false);
+        // onResume-এ requireDb() আবার চলে — আইকন যেন ডুপ্লিকেট না হয়
+        clearToolbarActions();
         addSearchAction();
         addSettingsAction();
         load();
