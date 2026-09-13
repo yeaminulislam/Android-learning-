@@ -34,6 +34,10 @@ public class SpeciesListActivity extends BaseActivity {
     public static final String EXTRA_FAMILY = "family";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_COLOR = "color";
+    public static final String EXTRA_REGION = "region";
+    public static final String EXTRA_HABITAT = "habitat";
+    public static final String EXTRA_REGION_LAB = "region_lab";
+    public static final String EXTRA_HABITAT_LAB = "habitat_lab";
 
     /** এই স্ক্রিনের নিজস্ব মোড (Repository.MODE_* ছাড়াও)। */
     public static final int MODE_ALL = Repository.MODE_ALL;
@@ -47,6 +51,7 @@ public class SpeciesListActivity extends BaseActivity {
 
     private int mode;
     private String groupId, classId, orderId, familyId, title;
+    private String regionKey, habitatKey, regionLab, habitatLab;
     private int color;
 
     private ListView list;
@@ -97,12 +102,32 @@ public class SpeciesListActivity extends BaseActivity {
 
     public static void start(Context c, int mode, String groupId, String classId,
                              String orderId, String familyId, String title, int color) {
+        start(c, mode, groupId, classId, orderId, familyId, title, color, null, null);
+    }
+
+    /** অঞ্চল/পরিবেশ ফিল্টারসহ তালিকা (ব্লুপ্রিন্ট লেভেল ২ → ৩)। */
+    public static void start(Context c, int mode, String groupId, String classId,
+                             String orderId, String familyId, String title, int color,
+                             String regionKey, String habitatKey) {
+        start(c, mode, groupId, classId, orderId, familyId, title, color,
+                regionKey, habitatKey, null, null);
+    }
+
+    /** ফিল্টারের বাংলা লেবেলসহ। */
+    public static void start(Context c, int mode, String groupId, String classId,
+                             String orderId, String familyId, String title, int color,
+                             String regionKey, String habitatKey,
+                             String regionLab, String habitatLab) {
         Intent i = new Intent(c, SpeciesListActivity.class);
         i.putExtra(EXTRA_MODE, mode);
         if (groupId != null) i.putExtra(EXTRA_GROUP, groupId);
         if (classId != null) i.putExtra(EXTRA_CLASS, classId);
         if (orderId != null) i.putExtra(EXTRA_ORDER, orderId);
         if (familyId != null) i.putExtra(EXTRA_FAMILY, familyId);
+        if (regionKey != null) i.putExtra(EXTRA_REGION, regionKey);
+        if (habitatKey != null) i.putExtra(EXTRA_HABITAT, habitatKey);
+        if (regionLab != null) i.putExtra(EXTRA_REGION_LAB, regionLab);
+        if (habitatLab != null) i.putExtra(EXTRA_HABITAT_LAB, habitatLab);
         i.putExtra(EXTRA_TITLE, title == null ? "" : title);
         i.putExtra(EXTRA_COLOR, color);
         c.startActivity(i);
@@ -118,6 +143,10 @@ public class SpeciesListActivity extends BaseActivity {
         orderId = in.getStringExtra(EXTRA_ORDER);
         familyId = in.getStringExtra(EXTRA_FAMILY);
         title = in.getStringExtra(EXTRA_TITLE);
+        regionKey = in.getStringExtra(EXTRA_REGION);
+        habitatKey = in.getStringExtra(EXTRA_HABITAT);
+        regionLab = in.getStringExtra(EXTRA_REGION_LAB);
+        habitatLab = in.getStringExtra(EXTRA_HABITAT_LAB);
         color = in.getIntExtra(EXTRA_COLOR, Ui.color(this, R.color.green_primary));
         requireDb();
     }
@@ -156,6 +185,28 @@ public class SpeciesListActivity extends BaseActivity {
         addChip("সংকটাপন্ন", "EN".equals(iucnFilter), chipClick("EN"));
         addChip("মারাত্মক", "CR".equals(iucnFilter), chipClick("CR"));
         addChip("বিলুপ্ত", "EX".equals(iucnFilter), chipClick("EX"));
+        if (regionKey != null && regionKey.length() > 0) {
+            addChip("🌍 " + (regionLab == null ? regionKey : regionLab) + " ✕",
+                    true, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    start(v.getContext(), mode, groupId, classId, orderId, familyId,
+                            title, color, null, habitatKey, null, habitatLab);
+                    finish();
+                }
+            });
+        }
+        if (habitatKey != null && habitatKey.length() > 0) {
+            addChip("🏞 " + (habitatLab == null ? habitatKey : habitatLab) + " ✕",
+                    true, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    start(v.getContext(), mode, groupId, classId, orderId, familyId,
+                            title, color, regionKey, null, regionLab, null);
+                    finish();
+                }
+            });
+        }
 
         list = new ListView(this);
         list.setDivider(null);
@@ -260,7 +311,8 @@ public class SpeciesListActivity extends BaseActivity {
     private int countNow() {
         if (mode == MODE_FAVORITES) return favoriteIds.size();
         if (mode == MODE_RELATED) return relatedIds.size();
-        return repo.countOf(mode, groupId, classId, orderId, familyId, iucnFilter);
+        return repo.countOf(mode, groupId, classId, orderId, familyId, iucnFilter,
+                regionKey, habitatKey);
     }
 
     private void loadMore() {
@@ -281,7 +333,7 @@ public class SpeciesListActivity extends BaseActivity {
                     page = repo.pageOfIds(relatedIds, fromOffset);
                 } else {
                     page = repo.pageAfter(mode, groupId, classId, orderId, familyId,
-                            fromSeq, fromId, popular, iucnFilter);
+                            fromSeq, fromId, popular, iucnFilter, regionKey, habitatKey);
                 }
                 lastPage = page;
                 lastPopularUsed = popular;

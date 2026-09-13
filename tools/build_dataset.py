@@ -26,10 +26,19 @@ sys.path.insert(0, os.path.join(ROOT, "data"))
 import curated_species as CS          # noqa: E402
 import generator as GEN               # noqa: E402
 import taxonomy as TAX                # noqa: E402
-from groups import GROUPS, CLASS_BN, ORDER_BN  # noqa: E402
+from groups import GROUPS, GLOBAL_COUNT, CLASS_BN, ORDER_BN  # noqa: E402
 
 # গ্রুপ → (রাজ্য, পর্ব) — বিস্তারিত পর্বে দেখানোর জন্য
 KINGDOM_PHYLUM = {
+    "insects": ("প্রাণীজগৎ (Animalia)", "সন্ধিপদী (Arthropoda)"),
+    "arachnids": ("প্রাণীজগৎ (Animalia)", "সন্ধিপদী (Arthropoda)"),
+    "ants": ("প্রাণীজগৎ (Animalia)", "সন্ধিপদী (Arthropoda)"),
+    "mollusks": ("প্রাণীজগৎ (Animalia)", "মলুসকা (Mollusca)"),
+    "crustaceans": ("প্রাণীজগৎ (Animalia)", "সন্ধিপদী (Arthropoda)"),
+    "other_inverts": ("প্রাণীজগৎ (Animalia)", "বিবিধ পর্ব"),
+    "snakes": ("প্রাণীজগৎ (Animalia)", "কর্ডাটা (Chordata)"),
+    "lizards_turtles": ("প্রাণীজগৎ (Animalia)", "কর্ডাটা (Chordata)"),
+    "micro_life": ("ছত্রাক, প্রোক্যারিওট ও ভাইরাস", "বিবিধ"),
     "mammals": ("প্রাণীজগৎ (Animalia)", "কর্ডাটা (Chordata)"),
     "birds": ("প্রাণীজগৎ (Animalia)", "কর্ডাটা (Chordata)"),
     "reptiles": ("প্রাণীজগৎ (Animalia)", "কর্ডাটা (Chordata)"),
@@ -53,7 +62,8 @@ CHUNK = 4000
 SPECIES_COLUMNS = [
     "id", "bn_name", "en_name", "sci_name", "authority",
     "class_id", "order_id", "family_id", "group_id",
-    "region_bn", "habitat_bn", "diet_bn", "iucn", "size_bn",
+    "region_bn", "region_key", "habitat_bn", "habitat_key",
+    "diet_bn", "iucn", "size_bn",
     "venom_level", "venom_bn", "repro_bn", "fact_bn", "extinct_bn",
     "notes_bn", "is_demo", "popularity", "row_seq", "extinct", "dangerous",
 ]
@@ -85,7 +95,9 @@ CREATE TABLE species (
     family_id    TEXT NOT NULL DEFAULT '',
     group_id     TEXT NOT NULL,
     region_bn    TEXT NOT NULL DEFAULT '',
+    region_key   TEXT NOT NULL DEFAULT '',
     habitat_bn   TEXT NOT NULL DEFAULT '',
+    habitat_key  TEXT NOT NULL DEFAULT '',
     diet_bn      TEXT NOT NULL DEFAULT '',
     iucn         TEXT NOT NULL DEFAULT 'LC',
     size_bn      TEXT NOT NULL DEFAULT '',
@@ -121,8 +133,21 @@ CREATE TABLE category_group (
     class_count   INTEGER NOT NULL DEFAULT 0,
     order_count   INTEGER NOT NULL DEFAULT 0,
     family_count  INTEGER NOT NULL DEFAULT 0,
-    sort_order  INTEGER NOT NULL DEFAULT 0
+    sort_order  INTEGER NOT NULL DEFAULT 0,
+    global_count INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE region (
+    id        TEXT PRIMARY KEY,
+    bn_name   TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0
+) WITHOUT ROWID;
+
+CREATE TABLE habitat (
+    id        TEXT PRIMARY KEY,
+    bn_name   TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0
+) WITHOUT ROWID;
 
 CREATE TABLE taxon_class (
     class_id    TEXT NOT NULL,
@@ -188,6 +213,9 @@ CREATE INDEX idx_species_venom     ON species(venom_level, row_seq);
 CREATE INDEX idx_species_danger    ON species(dangerous, row_seq);
 CREATE INDEX idx_species_extinct   ON species(extinct, row_seq);
 CREATE INDEX idx_species_demo      ON species(is_demo, row_seq);
+CREATE INDEX idx_species_region    ON species(group_id, region_key, row_seq);
+CREATE INDEX idx_species_habitat   ON species(group_id, habitat_key, row_seq);
+CREATE INDEX idx_species_reg_hab   ON species(group_id, region_key, habitat_key, row_seq);
 CREATE INDEX idx_species_bn        ON species(bn_name);
 CREATE INDEX idx_species_en_lower  ON species(lower(en_name));
 CREATE INDEX idx_species_sci_lower ON species(lower(sci_name));
@@ -200,6 +228,15 @@ CREATE INDEX idx_family_count      ON taxon_family(species_count DESC);
 """
 
 GROUP_BLURB = {
+    "insects": "কীটপতঙ্গ — পৃথিবীর সবচেয়ে বড় প্রাণীগ্রুপ; প্রজাপতি, মাছি, বিটল ও পঙ্গপাল।",
+    "arachnids": "মাকড়সা ও অ্যারাকনিড — আট পা, দুই অংশের দেহ; তারান্তুলা, বিচ্ছু ও মাইট।",
+    "ants": "পিঁপড়া (Formicidae) — সমাজবদ্ধ কীট; লিফ-কাটার, ফায়ার এন্ট ও ডেজার্ট এন্ট।",
+    "mollusks": "মলুস্ক — নরম দেহ, প্রায়ই খোলসে ঢাকা; অক্টোপাস, স্কুইড, শামুক ও ঝিনুক।",
+    "crustaceans": "ক্রাস্টেশিয়ান — খোলসযুক্ত জলজ সন্ধিপদী; চিংড়ি, কাঁকড়া, লবস্টার ও বার্নাকল।",
+    "snakes": "সাপ (Serpentes) — পাবিহীন সরীসৃপ; বিষাক্ত, বিষহীন, সামুদ্রিক ও বৃক্ষবাসী।",
+    "lizards_turtles": "টিকটিকি, গুইসাপ, ক্যামেলিয়ন, কচ্ছপ ও কুমির — খোলস বা আঁশযুক্ত সরীসৃপ।",
+    "micro_life": "অণুজীব, ছত্রাক ও ভাইরাস — ব্যাকটেরিয়া, মাশরুম, ইস্ট, প্রোটোজোয়া ও ভাইরাস।",
+    "other_inverts": "অন্যান্য অমেরুদণ্ডী — জেলিফিশ, প্রবাল, কেঁচো, তারামাছ ও স্পঞ্জ।",
     "mammals": "স্তন্যপায়ী — বাচ্চাকে দুধ খাওয়ায়, শরীরে লোম বা পশম।",
     "birds": "পাখি — পালক, ডানা ও ডিম পাড়া উষ্ণরক্তী প্রাণী।",
     "reptiles": "সরীসৃপ — আঁশে ঢাকা ঠান্ডা রক্তের ডিমপাড়ী প্রাণী।",
@@ -224,7 +261,7 @@ def _curated_rows(start_id, demo_upto):
     out = []
     for i, r in enumerate(CS.parse_curated()):
         sid = start_id + i
-        gid = r["group_id"]
+        gid = TAX.new_group(r["group_id"], r["class_id"], r["order_id"], r["family_id"])
         ginfo = GROUP_INDEX.get(gid, ("", "", "", "", "#2E7D32"))
         kp = KINGDOM_PHYLUM.get(gid, ("", ""))
         notes = r["notes_bn"]
@@ -237,7 +274,10 @@ def _curated_rows(start_id, demo_upto):
             "sci_name": r["sci_name"], "authority": r["authority"],
             "class_id": r["class_id"], "order_id": r["order_id"],
             "family_id": r["family_id"], "group_id": gid,
-            "region_bn": r["region_bn"], "habitat_bn": r["habitat_bn"],
+            "region_bn": r["region_bn"],
+            "region_key": GEN.region_key_of(r["region_bn"]),
+            "habitat_bn": r["habitat_bn"],
+            "habitat_key": GEN.habitat_key(r["habitat_bn"]),
             "diet_bn": r["diet_bn"], "iucn": r["iucn"], "size_bn": r["size_bn"],
             "venom_level": r["venom_level"], "venom_bn": r["venom_bn"],
             "repro_bn": r["repro_bn"], "fact_bn": fact,
@@ -412,10 +452,16 @@ def write_taxonomy(conn, grp_count, cls_count, ord_count, fam_count, names):
             GROUP_BLURB.get(gid, ""),
             grp_count.get(gid, 0), len(grp_classes.get(gid, ())),
             len(grp_orders.get(gid, ())), grp_fams.get(gid, 0),
-            order_i.get(gid, 99),
+            order_i.get(gid, 99), GLOBAL_COUNT.get(gid, 0),
         ))
     conn.executemany(
-        "INSERT INTO category_group VALUES (?,?,?,?,?,?,?,?,?,?,?)", groups)
+        "INSERT INTO category_group VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", groups)
+    conn.executemany(
+        "INSERT INTO region VALUES (?,?,?)",
+        [(k, bn, i) for i, (k, bn) in enumerate(GEN.REGIONS_LIST)])
+    conn.executemany(
+        "INSERT INTO habitat VALUES (?,?,?)",
+        [(k, bn, i) for i, (k, bn) in enumerate(GEN.HABITATS_LIST)])
 
     cls_rows, ord_rows, fam_rows = [], [], []
     # শ্রেণি
@@ -493,7 +539,7 @@ def write_meta(conn, inserted, nc, total):
         ("curated_total", str(nc)),
         ("planned_total", str(total)),
         ("fts_version", "5"),
-        ("page_size", "24"),
+        ("page_size", "20"),
         ("demo_upto", "500"),
         ("lang", "bn"),
         ("offline", "1"),

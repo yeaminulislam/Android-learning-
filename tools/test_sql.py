@@ -32,7 +32,7 @@ CONST_RE = re.compile(
     r'public static final String (\w+) =\s*((?:"[^"]*"\s*\+?\s*)+);', re.S)
 STR_RE = re.compile(r'"((?:[^"\\]|\\.)*)"')
 
-PAGE = 25          # Repository.PAGE_SIZE
+PAGE = 20          # Repository.PAGE_SIZE
 
 
 def java_const(name):
@@ -94,11 +94,13 @@ QUERIES = [
     ('SELECT_FULL (বিস্তারিত পর্দা)', SELECT_FULL + ' WHERE s.id=?', (1,), True),
     ('groups (প্রধান পর্দা)',
      'SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,'
-     ' species_count, class_count, order_count, family_count, sort_order'
+     ' species_count, class_count, order_count, family_count, sort_order,'
+     ' IFNULL(global_count, 0)'
      ' FROM category_group ORDER BY sort_order', (), True),
     ('group',
      'SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,'
-     ' species_count, class_count, order_count, family_count, sort_order'
+     ' species_count, class_count, order_count, family_count, sort_order,'
+     ' IFNULL(global_count, 0)'
      ' FROM category_group WHERE group_id=?', ('mammals',), True),
     ('classes',
      'SELECT class_id, group_id, sci_name, bn_name, species_count,'
@@ -140,6 +142,20 @@ QUERIES = [
      'SELECT s.id FROM species_fts f JOIN species s ON s.id=f.rowid'
      ' WHERE species_fts MATCH ? ORDER BY rank LIMIT ?', ('"বাঘ"*', 15), True),
     ('countAll', 'SELECT COUNT(*) FROM species', (), True),
+    ('regions (লেভেল-২ ফিল্টার)', 'SELECT id, bn_name FROM region ORDER BY sort_order', (), True),
+    ('habitats (লেভেল-২ ফিল্টার)', 'SELECT id, bn_name FROM habitat ORDER BY sort_order', (), True),
+    ('page seq +region', page_seq('GROUP').replace(
+        ' AND s.group_id=?', ' AND s.group_id=? AND s.region_key=?', 1),
+     (0, 'mammals', 'BD'), True),
+    ('page seq +habitat', page_seq('GROUP').replace(
+        ' AND s.group_id=?', ' AND s.group_id=? AND s.habitat_key=?', 1),
+     (0, 'snakes', 'forest'), True),
+    ('page seq +region+habitat', page_seq('GROUP').replace(
+        ' AND s.group_id=?', ' AND s.group_id=? AND s.region_key=? AND s.habitat_key=?', 1),
+     (0, 'insects', 'SA', 'cropland'), True),
+    ('count +region+habitat', count_of('GROUP').replace(
+        ' AND s.group_id=?', ' AND s.group_id=? AND s.region_key=? AND s.habitat_key=?', 1),
+     ('fishes', 'BD', 'freshwater'), True),
 ]
 
 # ── ব্যবহারকারীর নিজস্ব ডেটাবেসের কুয়েরি (আলাদা ফাইলে টেবিল বানায়) ──────

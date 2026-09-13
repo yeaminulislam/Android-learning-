@@ -80,8 +80,9 @@ def _blocks():
 def build_taxonomy():
     """গ্রুপ → শ্রেণি → বর্গ → [(পরিবার, বাংলা)] কাঠামো।"""
     seen = set()
-    tax = {gid: {} for gid, _, _, _, _ in GROUPS}
+    tax = {}
     for gid, rows in _blocks():
+        tax.setdefault(gid, {})
         for cls, order, fam_sci, fam_bn in rows:
             key = (cls, order, fam_sci)
             if key in seen:
@@ -95,11 +96,73 @@ def build_taxonomy():
 TAXONOMY = build_taxonomy()
 
 
+# ── ব্লুপ্রিন্ট অনুযায়ী নতুন প্রধান বিভাগে রিম্যাপ ──────────────────────────
+# সাপের পরিবার (Serpentes) — বাকি Squamata টিকটিকি/গুইসাপ
+SNAKE_FAMS = {
+    "Pythonidae", "Boidae", "Colubridae", "Elapidae", "Viperidae", "Natricidae",
+    "Homalopsidae", "Acrochordidae", "Typhlopidae", "Leptotyphlopidae",
+    "Pareatidae", "Xenodermatidae",
+}
+# পিঁপড়ার পরিবার — ব্লুপ্রিন্টে আলাদা প্রধান বিভাগ
+ANT_FAMS = {"Formicinae_fam", "Myrmicinae_fam", "Oecophyllinae_fam"}
+
+_MOLLUSK_CLASSES = {"Mollusca"}
+_CRUSTACEAN_CLASSES = {"Crustacea", "Arthropoda_marine"}
+_MICRO_CLASSES = {
+    "Agaricomycetes", "Ascomycetes", "Zygomycetes", "Oomycetes", "Myxomycetes",
+    "Lichenes", "Bacilli", "Gammaproteobacteria", "Alphaproteobacteria",
+    "Betaproteobacteria", "Actinobacteria", "Clostridia", "Cyanobacteria",
+    "Bacteroidia", "Apicomplexa", "Archaea", "Fusobacteria", "Spirochaetes",
+}
+_PLANT_CLASSES = {
+    "Magnoliopsida", "Liliopsida", "Pinopsida", "Polypodiopsida", "Bryopsida",
+    "Anthocerotopsida", "Cycadopsida", "Ginkgoopsida",
+}
+
+
+def new_group(old_gid, cls_sci, ord_sci, fam_sci):
+    """পুরোনো গ্রুপ-আইডি + শ্রেণি/বর্গ/পরিবার → ব্লুপ্রিন্টের নতুন গ্রুপ-আইডি।"""
+    if old_gid == "reptiles":
+        if fam_sci in SNAKE_FAMS:
+            return "snakes"
+        return "lizards_turtles"
+    if old_gid == "inverts":
+        if cls_sci == "Insecta":
+            return "ants" if fam_sci in ANT_FAMS else "insects"
+        if cls_sci == "Arachnida":
+            return "arachnids"
+        if cls_sci in _MOLLUSK_CLASSES:
+            return "mollusks"
+        if cls_sci in _CRUSTACEAN_CLASSES:
+            return "crustaceans"
+        return "other_inverts"
+    if old_gid == "marine":
+        if cls_sci in _MOLLUSK_CLASSES:
+            return "mollusks"
+        if cls_sci in _CRUSTACEAN_CLASSES:
+            return "crustaceans"
+        if cls_sci == "Chordata_marine":
+            return "fishes" if ord_sci == "Petromyzontiformes" else "other_inverts"
+        return "other_inverts"
+    if old_gid in ("fungi", "microbes", "viruses"):
+        return "micro_life"
+    if cls_sci in _MICRO_CLASSES:
+        return "micro_life"
+    if cls_sci in _PLANT_CLASSES or old_gid == "plants":
+        return "plants"
+    if old_gid == "amphibians":
+        return "amphibians"
+    return old_gid          # mammals / birds / fishes / dinosaurs অপরিবর্তিত
+
+
 def iter_taxonomy():
     """(group_id, group_bn, group_en, emoji, color, class_sci, class_bn,
-    order_sci, order_bn, family_sci, family_bn) জেনারেট করে।"""
-    for gid, gbn, gen, emoji, color in GROUPS:
-        classes = TAXONOMY.get(gid)
+    order_sci, order_bn, family_sci, family_bn) জেনারেট করে — নতুন বিভাগ-আইডি সহ।
+    একই (গ্রুপ, শ্রেণি, বর্গ, পরিবার) একবারের বেশি আসে না।"""
+    from groups import GROUP_INFO, CLASS_BN, ORDER_BN
+    seen = set()
+    for old_gid in TAXONOMY:
+        classes = TAXONOMY.get(old_gid)
         if not classes:
             continue
         for cls_sci, orders in classes.items():
@@ -107,8 +170,14 @@ def iter_taxonomy():
             for ord_sci, fams in orders.items():
                 ord_bn = ORDER_BN.get(ord_sci, ord_sci.replace("_ord", ""))
                 for fam_sci, fam_bn in fams:
-                    yield (gid, gbn, gen, emoji, color,
-                           cls_sci, cls_bn, ord_sci, ord_bn, fam_sci, fam_bn)
+                    gid = new_group(old_gid, cls_sci, ord_sci, fam_sci)
+                    key = (gid, cls_sci, ord_sci, fam_sci)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    g = GROUP_INFO.get(gid, (gid, gid, gid, "", "#2E7D32"))
+                    yield (gid, g[1], g[2], g[3], g[4], cls_sci, cls_bn,
+                           ord_sci, ord_bn, fam_sci, fam_bn)
 
 
 def family_count():

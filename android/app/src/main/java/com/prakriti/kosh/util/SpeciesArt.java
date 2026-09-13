@@ -157,10 +157,22 @@ public final class SpeciesArt {
 
     // ------------------------------------------------------------ প্রধান এন্ট্রি
 
+    /** ব্লুপ্রিন্টের নতুন বিভাগ-আইডি → আঁকার পুরোনো কী (ছবি/রঙের ছাঁচ)। */
+    public static String artKey(String g) {
+        if (g == null) return "";
+        if (g.equals("insects") || g.equals("arachnids") || g.equals("ants")
+                || g.equals("mollusks") || g.equals("crustaceans")
+                || g.equals("other_inverts")) return "inverts";
+        if (g.equals("snakes") || g.equals("lizards_turtles")) return "reptiles";
+        if (g.equals("micro_life")) return "microbes";
+        return g;
+    }
+
     /** পূর্ণ চিত্র (গ্যালারি)। */
     public static void draw(Canvas cv, int w, int h, long speciesId, String classId,
                             String groupId, String habitat, int venomLevel, boolean extinct,
                             int variant) {
+        groupId = artKey(groupId);
         long seed = seedOf(speciesId, classId, groupId, variant);
         drawInternal(cv, w, h, seed, classId, groupId, habitat, venomLevel, extinct,
                 variant, true);
@@ -170,6 +182,7 @@ public final class SpeciesArt {
     public static void drawThumb(Canvas cv, int w, int h, long speciesId, String classId,
                                  String groupId, String habitat, int venomLevel,
                                  boolean extinct) {
+        groupId = artKey(groupId);
         long seed = seedOf(speciesId, classId, groupId, 0);
         drawInternal(cv, w, h, seed, classId, groupId, habitat, venomLevel, extinct, 0, false);
     }

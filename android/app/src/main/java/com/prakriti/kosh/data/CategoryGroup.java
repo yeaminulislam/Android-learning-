@@ -15,10 +15,12 @@ public final class CategoryGroup {
     public final int orderCount;
     public final int familyCount;
     public final int sortOrder;
+    /** বিশ্বব্যাপী নথিভুক্ত প্রজাতি সংখ্যা (ব্লুপ্রিন্ট)। */
+    public final long globalCount;
 
     public CategoryGroup(String groupId, String bnName, String enName, String emoji,
                          String color, String blurb, int speciesCount, int classCount,
-                         int orderCount, int familyCount, int sortOrder) {
+                         int orderCount, int familyCount, int sortOrder, long globalCount) {
         this.groupId = groupId;
         this.bnName = bnName;
         this.enName = enName;
@@ -30,11 +32,13 @@ public final class CategoryGroup {
         this.orderCount = orderCount;
         this.familyCount = familyCount;
         this.sortOrder = sortOrder;
+        this.globalCount = globalCount;
     }
 
     public static CategoryGroup from(Cursor c) {
         return new CategoryGroup(c.getString(0), c.getString(1), c.getString(2),
                 c.getString(3), c.getString(4), c.isNull(5) ? "" : c.getString(5),
-                c.getInt(6), c.getInt(7), c.getInt(8), c.getInt(9), c.getInt(10));
+                c.getInt(6), c.getInt(7), c.getInt(8), c.getInt(9), c.getInt(10),
+                c.getLong(11));
     }
 }

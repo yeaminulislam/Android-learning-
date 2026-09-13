@@ -326,6 +326,14 @@ public class MainActivity extends BaseActivity {
         Ui.margins(sub, 0, Ui.dp(this, 6), 0, 0);
         box.addView(sub);
 
+        if (g.globalCount > 0) {
+            TextView wc = Ui.text(this,
+                    "🌍 বিশ্বব্যাপী নথিভুক্ত ~" + Ui.humanCount(g.globalCount) + " প্রজাতি",
+                    10.5f, Ui.color(this, R.color.text_muted), false);
+            Ui.margins(wc, 0, Ui.dp(this, 3), 0, 0);
+            box.addView(wc);
+        }
+
         card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

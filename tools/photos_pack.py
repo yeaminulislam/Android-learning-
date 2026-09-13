@@ -125,7 +125,49 @@ def install(db_path, assets_dir):
     return n
 
 
+TARGET_BYTES = 15 * 1024   # ব্লুপ্রিন্ট: প্রতিটি ছবি ১০–১৫ KB
+
+
+def shrink():
+    """১৫ KB-র চেয়ে বড় WebP-গুলো আবার এনকোড করে ছোট করে (মান কমিয়ে)।"""
+    from PIL import Image
+    rows = read_queue()
+    n = saved = 0
+    for r in rows:
+        out = os.path.join(WEBP, '%d.webp' % r['id'])
+        if not os.path.exists(out):
+            continue
+        before = os.path.getsize(out)
+        if before <= TARGET_BYTES:
+            continue
+        try:
+            im = Image.open(out)
+            im.load()
+            if im.mode not in ('RGB', 'L'):
+                im = im.convert('RGB')
+        except Exception:
+            continue
+        for edge, q in ((360, 62), (320, 52), (288, 45), (256, 40)):
+            w, h = im.size
+            if max(w, h) > edge:
+                sc = edge / float(max(w, h))
+                im2 = im.resize((max(1, int(w * sc)), max(1, int(h * sc))), Image.LANCZOS)
+            else:
+                im2 = im
+            im2.save(out, 'webp', quality=q, method=6)
+            if os.path.getsize(out) <= TARGET_BYTES:
+                break
+        after = os.path.getsize(out)
+        if after < before:
+            n += 1
+            saved += before - after
+    print('✅ ছোট করা হলো %dটি ছবি, সাশ্রয় %.1f MB' % (n, saved / 1e6))
+    return 0
+
+
 if __name__ == '__main__':
+    if len(sys.argv) >= 2 and sys.argv[1] == 'shrink':
+        sys.exit(shrink())
     if len(sys.argv) >= 2 and sys.argv[1] == 'install':
         if len(sys.argv) < 4:
             sys.exit('ব্যবহার: photos_pack.py install <db> <assets-dir>')

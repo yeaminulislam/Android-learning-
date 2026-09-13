@@ -21,7 +21,7 @@ import java.util.List;
  */
 public final class Repository {
 
-    public static final int PAGE_SIZE = 24;
+    public static final int PAGE_SIZE = 20;
 
     /** তালিকার ধরন। */
     public static final int MODE_ALL = 0;
@@ -121,7 +121,8 @@ public final class Repository {
         List<CategoryGroup> out = new ArrayList<CategoryGroup>();
         Cursor c = db.rawQuery(
                 "SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,"
-                + " species_count, class_count, order_count, family_count, sort_order"
+                + " species_count, class_count, order_count, family_count, sort_order,"
+                + " IFNULL(global_count, 0)"
                 + " FROM category_group ORDER BY sort_order", null);
         try {
             while (c.moveToNext()) out.add(CategoryGroup.from(c));
@@ -134,13 +135,37 @@ public final class Repository {
     public CategoryGroup group(String groupId) {
         Cursor c = db.rawQuery(
                 "SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,"
-                + " species_count, class_count, order_count, family_count, sort_order"
+                + " species_count, class_count, order_count, family_count, sort_order,"
+                + " IFNULL(global_count, 0)"
                 + " FROM category_group WHERE group_id=?", new String[]{groupId});
         try {
             return c.moveToFirst() ? CategoryGroup.from(c) : null;
         } finally {
             c.close();
         }
+    }
+
+    /** অঞ্চল-ফিল্টারের তালিকা (id, বাংলা নাম)। */
+    public List<String[]> regions() {
+        return labelPairs("region");
+    }
+
+    /** পরিবেশ-ফিল্টারের তালিকা (id, বাংলা নাম)। */
+    public List<String[]> habitats() {
+        return labelPairs("habitat");
+    }
+
+    private List<String[]> labelPairs(String table) {
+        List<String[]> out = new ArrayList<String[]>();
+        Cursor c = db.rawQuery("SELECT id, bn_name FROM " + table
+                + " ORDER BY sort_order", null);
+        try {
+            while (c.moveToNext()) out.add(new String[]{c.getString(0), c.getString(1)});
+        } catch (Throwable ignored) {
+        } finally {
+            c.close();
+        }
+        return out;
     }
 
     public List<TaxonNode> classes(String groupId) {
@@ -235,6 +260,14 @@ public final class Repository {
     public Page pageAfter(int mode, String groupId, String classId, String orderId,
                           String familyId, long lastSeq, long lastId, boolean byPopular,
                           String iucn) {
+        return pageAfter(mode, groupId, classId, orderId, familyId, lastSeq, lastId,
+                byPopular, iucn, null, null);
+    }
+
+    /** পরের পৃষ্ঠা — অঞ্চল ও পরিবেশ ফিল্টারসহ (ব্লুপ্রিন্ট লেভেল ২)। */
+    public Page pageAfter(int mode, String groupId, String classId, String orderId,
+                          String familyId, long lastSeq, long lastId, boolean byPopular,
+                          String iucn, String regionKey, String habitatKey) {
         StringBuilder sql = new StringBuilder();
         List<String> args = new ArrayList<String>();
         String order;
@@ -245,12 +278,14 @@ public final class Repository {
             args.add(Long.toString(pop));
             args.add(Long.toString(pop));
             args.add(Long.toString(lastId));
-            appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId);
+            appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId,
+                    regionKey, habitatKey);
             order = " ORDER BY s.popularity DESC, s.id LIMIT " + (PAGE_SIZE + 1);
         } else {
             sql.append("SELECT s.id, s.row_seq FROM species s WHERE s.row_seq>?");
             args.add(Long.toString(lastSeq));
-            appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId);
+            appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId,
+                    regionKey, habitatKey);
             order = " ORDER BY s.row_seq LIMIT " + (PAGE_SIZE + 1);
         }
         if (iucn != null && iucn.length() > 0) {
@@ -309,6 +344,13 @@ public final class Repository {
     private static void appendScopeAliased(StringBuilder sql, List<String> args, int mode,
                                            String groupId, String classId, String orderId,
                                            String familyId) {
+        appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId, null, null);
+    }
+
+    private static void appendScopeAliased(StringBuilder sql, List<String> args, int mode,
+                                           String groupId, String classId, String orderId,
+                                           String familyId, String regionKey,
+                                           String habitatKey) {
         switch (mode) {
             case MODE_ALL:
                 break;
@@ -352,6 +394,14 @@ public final class Repository {
             default:
                 break;
         }
+        if (regionKey != null && regionKey.length() > 0) {
+            sql.append(" AND s.region_key=?");
+            args.add(regionKey);
+        }
+        if (habitatKey != null && habitatKey.length() > 0) {
+            sql.append(" AND s.habitat_key=?");
+            args.add(habitatKey);
+        }
     }
 
     /** কোনো পরিসরে মোট কত প্রজাতি। */
@@ -373,9 +423,16 @@ public final class Repository {
     /** IUCN ছাঁকনিসহ গণনা। */
     public int countOf(int mode, String groupId, String classId, String orderId,
                        String familyId, String iucn) {
+        return countOf(mode, groupId, classId, orderId, familyId, iucn, null, null);
+    }
+
+    /** ফিল্টারসহ গণনা (অঞ্চল/পরিবেশ)। */
+    public int countOf(int mode, String groupId, String classId, String orderId,
+                       String familyId, String iucn, String regionKey, String habitatKey) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM species s WHERE 1=1");
         List<String> args = new ArrayList<String>();
-        appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId);
+        appendScopeAliased(sql, args, mode, groupId, classId, orderId, familyId,
+                regionKey, habitatKey);
         if (iucn != null && iucn.length() > 0) {
             sql.append(" AND s.iucn=?");
             args.add(iucn);

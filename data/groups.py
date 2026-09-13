@@ -2,20 +2,32 @@
 """প্রকৃতি কোষ — ১২টি প্রধান বিভাগ ও তাদের শ্রেণি/বর্গের বাংলা নাম।"""
 
 # (group_id, বাংলা, ইংরেজি, ইমোজি, রঙ)
+# ব্লুপ্রিন্ট অনুযায়ী ১২টি প্রধান বিভাগ + অতিরিক্ত ৩টি (উদ্ভিদ, অন্যান্য অমেরুদণ্ডী, জীবাশ্ম)
 GROUPS = [
-    ("mammals",    "স্তন্যপায়ী",                 "Mammals",       "🦌", "#2E7D32"),
-    ("birds",      "পাখি",                       "Birds",         "🦜", "#00695C"),
-    ("reptiles",   "সরীসৃপ",                     "Reptiles",      "🦎", "#558B2F"),
-    ("amphibians", "উভচর",                       "Amphibians",    "🐸", "#33691E"),
-    ("fishes",     "মাছ",                        "Fishes",        "🐟", "#0277BD"),
-    ("inverts",    "অমেরুদণ্ডী প্রাণী",           "Invertebrates", "🦋", "#6A1B9A"),
-    ("fungi",      "ছত্রাক",                      "Fungi",         "🍄", "#8D6E63"),
-    ("plants",     "উদ্ভিদ",                      "Plants",        "🌿", "#1B5E20"),
-    ("dinosaurs",  "ডাইনোসর ও প্রাগৈতিহাসিক",      "Prehistoric",   "🦖", "#BF360C"),
-    ("microbes",   "অণুজীব",                     "Microbes",      "🦠", "#455A64"),
-    ("viruses",    "ভাইরাস",                      "Viruses",       "🧬", "#37474F"),
-    ("marine",     "সামুদ্রিক জীব",               "Marine life",   "🐚", "#00838F"),
+    ("insects",         "কীটপতঙ্গ ও বিটল",              "Insects & Beetles",             "🪲", "#6A1B9A"),
+    ("arachnids",       "মাকড়সা ও অ্যারাকনিড",           "Spiders & Arachnids",           "🕷", "#5D4037"),
+    ("ants",            "পিঁপড়া",                        "Ants (Formicidae)",             "🐜", "#A1887F"),
+    ("mollusks",        "শামুক, অক্টোপাস ও খোলসযুক্ত জীব", "Mollusks",                      "🐙", "#00838F"),
+    ("crustaceans",     "চিংড়ি ও কাঁকড়া জাতীয়",           "Crustaceans",                   "🦐", "#D84315"),
+    ("fishes",          "মাছ",                           "Fishes",                        "🐟", "#0277BD"),
+    ("snakes",          "সরীসৃপ — সাপ",                   "Snakes (Serpentes)",            "🐍", "#558B2F"),
+    ("lizards_turtles", "টিকটিকি, কচ্ছপ ও কুমির",         "Lizards, Turtles & Crocs",      "🦎", "#33691E"),
+    ("amphibians",      "উভচর — ব্যাঙ ও স্যালামান্ডার",    "Amphibians",                    "🐸", "#2E7D32"),
+    ("birds",           "পাখি",                          "Birds (Aves)",                  "🦜", "#00695C"),
+    ("mammals",         "স্তন্যপায়ী প্রাণী",              "Mammals",                       "🦌", "#4E342E"),
+    ("micro_life",      "অণুজীব, ছত্রাক ও ভাইরাস",        "Microbes, Fungi & Viruses",     "🦠", "#455A64"),
+    ("plants",          "উদ্ভিদ",                        "Plants",                        "🌿", "#1B5E20"),
+    ("other_inverts",   "অন্যান্য অমেরুদণ্ডী",             "Other Invertebrates",           "🪼", "#7B1FA2"),
+    ("dinosaurs",       "ডাইনোসর ও প্রাগৈতিহাসিক",        "Prehistoric Life",              "🦖", "#BF360C"),
 ]
+
+# বিশ্বব্যাপী বিজ্ঞানীদের নথিভুক্ত প্রজাতি সংখ্যা (ব্লুপ্রিন্ট অনুযায়ী) — হোম কার্ডে দেখানো হয়
+GLOBAL_COUNT = {
+    "insects": 1025000, "arachnids": 52082, "ants": 15700, "mollusks": 85000,
+    "crustaceans": 70000, "fishes": 35755, "snakes": 4038, "lizards_turtles": 7132,
+    "amphibians": 8746, "birds": 11000, "mammals": 6495, "micro_life": 150000,
+    "plants": 0, "other_inverts": 0, "dinosaurs": 0,
+}
 
 GROUP_INFO = {g[0]: g for g in GROUPS}
 

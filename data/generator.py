@@ -102,7 +102,71 @@ BAD_HAB_WORDS = ("সমুদ্র", "সাগর", "মহাসাগর", 
                  "হাইড্রোথার্মাল", "কেল্প", "সি গ্রাস", "মোহনা", "উপকূল", "আর্কটিক",
                  "লোনা", "ম্যানগ্রোভ")
 
-MICROBE_GROUPS = {"microbes", "viruses"}
+MICROBE_GROUPS = {"microbes", "viruses", "micro_life"}
+
+# নতুন বিভাগ-আইডি → পুরোনো ব্যাংক-আইডি (নাম/আকার/বাসস্থানের ছাঁচ অপরিবর্তিত)
+BANK = {
+    "insects": "inverts", "arachnids": "inverts", "ants": "inverts",
+    "mollusks": "inverts", "crustaceans": "inverts", "other_inverts": "inverts",
+    "snakes": "reptiles", "lizards_turtles": "reptiles",
+    "micro_life": "microbes",
+}
+
+# ব্লুপ্রিন্টের অনুপাত অনুযায়ী বিভাগভিত্তিক কোটা (মোট ~২.৬৭ লক্ষ)
+GROUP_QUOTA = {
+    "insects": 100000, "arachnids": 16000, "ants": 8000, "mollusks": 20000,
+    "crustaceans": 15000, "fishes": 14000, "snakes": 4038, "lizards_turtles": 7132,
+    "amphibians": 8746, "birds": 11000, "mammals": 6495, "micro_life": 28000,
+    "plants": 12000, "other_inverts": 9000, "dinosaurs": 2000,
+}
+
+# অঞ্চল-কী (ফিল্টারের জন্য) — name_banks.REGIONS-এর কোড + বাংলাদেশ আলাদা
+REGIONS_LIST = [
+    ("BD", "বাংলাদেশ"), ("SA", "দক্ষিণ এশিয়া"), ("SEA", "দক্ষিণ-পূর্ব এশিয়া"),
+    ("EA", "পূর্ব এশিয়া"), ("WA", "পশ্চিম এশিয়া"), ("CA", "মধ্য এশিয়া"),
+    ("EU", "ইউরোপ"), ("NA", "উত্তর আমেরিকা"), ("CB", "ক্যারিবিয়ান"),
+    ("SAM", "দক্ষিণ আমেরিকা ও আমাজন"), ("AF", "আফ্রিকা"),
+    ("OC", "অস্ট্রেলিয়া ও ওশেনিয়া"), ("PL", "মেরু অঞ্চল"), ("OCN", "সমুদ্র"),
+    ("WW", "সর্বত্র"),
+]
+HABITATS_LIST = [
+    ("wetland", "জলাভূমি ও ম্যানগ্রোভ"), ("marine", "সমুদ্র"),
+    ("freshwater", "মিঠাপানি"), ("forest", "বন"), ("desert", "মরুভূমি"),
+    ("mountain", "পাহাড় ও উঁচু অঞ্চল"), ("cropland", "কৃষিজমি ও বাগান"),
+    ("urban", "গ্রাম ও শহর"), ("grassland", "মাঠ ও ঘাসজমি"),
+    ("cave", "গুহা ও অন্ধকার"), ("general", "অন্যান্য"),
+]
+_HAB_KEYWORDS = [
+    ("wetland", ("জলাভূমি", "ম্যানগ্রোভ", "কাদাচর", "বদ্বীপ", "হাওর", "বিল", "চর")),
+    ("marine", ("সমুদ্র", "সাগর", "মহাসাগর", "লোনা", "মোহনা", "উপকূল", "প্রবাল")),
+    ("freshwater", ("নদী", "পুকুর", "খাল", "হ্রদ", "ঝর্ণা", "মিঠাপানি", "জলাশয়", "বাঁধ")),
+    ("desert", ("মরুভূমি", "মরু অঞ্চল", "শুষ্ক মরু", "মরুর")),
+    ("mountain", ("পাহাড়", "পর্বত", "উচ্চতা", "হিমালয়", "তুষার")),
+    ("forest", ("বন", "বাঁশঝাড়", "কানন", "অরণ্য", "ঝাউ")),
+    ("cropland", ("ধানক্ষেত", "খেত", "চাষ", "বাগান", "ক্ষেত", "কৃষি")),
+    ("urban", ("শহর", "গ্রাম", "বসতি", "গৃহ", "ঘরবাড়ি", "মন্দির")),
+    ("grassland", ("মাঠ", "ঘাস", "তৃণ", "সাভানা", "প্রান্তর")),
+    ("cave", ("গুহা", "অন্ধকার")),
+]
+
+
+def habitat_key(habitat_bn):
+    """বাসস্থানের বর্ণনা → ফিল্টার-কী।"""
+    for k, words in _HAB_KEYWORDS:
+        for w in words:
+            if w in habitat_bn:
+                return k
+    return "general"
+
+
+def region_key_of(region_bn):
+    """অঞ্চলের নাম → ফিল্টার-কী (বাংলাদেশ আলাদা)।"""
+    if region_bn == "বাংলাদেশ":
+        return "BD"
+    for bn, en, code in nb.REGIONS:
+        if bn == region_bn:
+            return code
+    return "WW"
 AQUATIC_PLANT_GROUPS = {"plants"}
 
 
@@ -319,6 +383,7 @@ WEIGHT_AS_GRAM = {"birds", "amphibians", "inverts"}
 
 
 def make_size(seed, group_id):
+    group_id = BANK.get(group_id, group_id)
     lo_a, hi_a, lo_c, hi_c, lo_d, hi_d = SIZE_RANGE.get(group_id, SIZE_RANGE["inverts"])
     tmpl = pick(seed, 91, nb.SIZES.get(group_id, nb.SIZES["inverts"]))
     a = lognum(seed, 92, lo_a, hi_a)
@@ -345,6 +410,7 @@ REPRO_RANGE = {
 
 
 def make_repro(seed, group_id):
+    group_id = BANK.get(group_id, group_id)
     lo_n, hi_n, lo_k, hi_k = REPRO_RANGE.get(group_id, (2, 60, 1, 10))
     tmpl = pick(seed, 101, nb.REPRO.get(group_id, nb.REPRO["inverts"]))
     n = lognum(seed, 102, lo_n, hi_n)
@@ -353,6 +419,7 @@ def make_repro(seed, group_id):
 
 
 def make_habitat(seed, group_id):
+    group_id = BANK.get(group_id, group_id)
     pool = nb.HABITATS.get(group_id, nb.HABITATS["inverts"])
     h = pick(seed, 111, pool)
     if group_id in MICROBE_GROUPS:
@@ -390,24 +457,35 @@ def iter_species(total=TOTAL):
     ফলে প্রতি পরিবারে প্রায় total/families টি প্রজাতি পড়ে।
     """
     fams = list(iter_taxonomy())
-    nf = len(fams)
-    per = max(1, total // nf)
-    rem = total - per * nf
 
     idx = 0          # প্রজাতির ক্রমিক (row_seq)
-    # পরিবারগুলোকে জনপ্রিয়তা অনুযায়ী আগে রাখি (স্তন্যপায়ী/পাখি আগে)
-    group_order = {g[0]: i for i, g in enumerate(GROUPS)}
-    fams.sort(key=lambda r: (group_order.get(r[0], 99), r[5], r[7], r[9]))
+    # ব্লুপ্রিন্টের কোটা অনুযায়ী বিভাগভিত্তিক বণ্টন (অনুপাত total-এ স্কেল করা)
+    by_group = {}
+    for f in fams:
+        by_group.setdefault(f[0], []).append(f)
+    wsum = float(sum(GROUP_QUOTA.values()))
+    fam_list = []     # [(fam_row, count), ...]
+    for gid, _, _, _, _ in GROUPS:
+        fl = by_group.get(gid)
+        if not fl:
+            continue
+        fl.sort(key=lambda r: (r[5], r[7], r[9]))
+        q = int(round(total * GROUP_QUOTA.get(gid, 1000) / wsum))
+        q = max(q, len(fl))
+        per = q // len(fl)
+        rem = q - per * len(fl)
+        for i, f in enumerate(fl):
+            fam_list.append((f, per + (1 if i < rem else 0)))
 
     used_bn = {}
     used_en = {}
     used_sci = {}
 
-    for fi, fam in enumerate(fams):
+    for fi, (fam, count) in enumerate(fam_list):
         (gid, gbn, gen, emoji, color, cls_sci, cls_bn, ord_sci, ord_bn, fam_sci, fam_bn) = fam
-        count = per + (1 if fi < rem else 0)
+        bgid = BANK.get(gid, gid)   # নাম/ছাঁচ-ব্যাংকের পুরোনো কী
         noun_bn = family_noun(fam_bn)
-        habitats = nb.HABITATS.get(gid, nb.HABITATS["inverts"])
+        habitats = nb.HABITATS.get(bgid, nb.HABITATS["inverts"])
 
         for j in range(count):
             idx += 1
@@ -420,7 +498,7 @@ def iter_species(total=TOTAL):
             place_bn = _place_bn(region_bn)
             place_en = _place_en(region_en)
 
-            habitat_bn = make_habitat(seed, gid)
+            habitat_bn = make_habitat(seed, bgid)
 
             # বাংলা নাম
             form = wpick(seed, 2, [(0, 45), (1, 15), (2, 25), (3, 15)])
@@ -446,7 +524,7 @@ def iter_species(total=TOTAL):
             eform = wpick(seed, 6, [(t, w) for t, w in nb.EN_NAME_FORMS])
             adj = pick(seed, 7, nb.EN_ADJ)
             adj2 = pick(seed, 8, nb.EN_ADJ)
-            en_noun = pick(seed, 9, nb.group_en_nouns(gid, fam_bn))
+            en_noun = pick(seed, 9, nb.group_en_nouns(bgid, fam_bn))
             person = pick(seed, 10, ["Anderson", "Blyth", "Hodgson", "Jerdon", "Gould",
                                      "Swinhoe", "Tikader", "Hora", "Boulenger", "Smith",
                                      "Gray", "Moore", "Peters", "Meyrick", "Hampson"])
@@ -476,7 +554,7 @@ def iter_species(total=TOTAL):
             authority = pick(seed, 15, nb.AUTHOR_SUFFIX)
 
             # খাদ্য
-            diet_bn = pick(seed, 16, nb.DIETS.get(gid, nb.DIETS["inverts"]))
+            diet_bn = pick(seed, 16, nb.DIETS.get(bgid, nb.DIETS["inverts"]))
 
             # IUCN / বিলুপ্তি
             iucn = wpick(seed, 17, [(k, w) for k, w in nb.IUCN_WEIGHT.items()])
@@ -494,21 +572,21 @@ def iter_species(total=TOTAL):
 
             # বিষাক্ততা
             venom_level = 0
-            if gid in ("reptiles",):
+            if bgid in ("reptiles",):
                 venom_level = wpick(seed, 20, [(0, 30), (1, 18), (2, 22), (3, 22), (4, 8)])
-            elif gid in ("inverts", "marine"):
+            elif bgid in ("inverts", "marine"):
                 venom_level = wpick(seed, 20, [(0, 55), (1, 20), (2, 15), (3, 8), (4, 2)])
-            elif gid in ("amphibians", "fungi", "plants"):
+            elif bgid in ("amphibians", "fungi", "plants"):
                 venom_level = wpick(seed, 20, [(0, 70), (1, 15), (2, 10), (3, 4), (4, 1)])
-            elif gid in ("microbes", "viruses"):
+            elif bgid in ("microbes", "viruses"):
                 venom_level = wpick(seed, 20, [(0, 10), (1, 20), (2, 35), (3, 25), (4, 10)])
             else:
                 venom_level = wpick(seed, 20, [(0, 88), (1, 8), (2, 3), (3, 1), (4, 0)])
             venom_bn = nb.VENOM_LEVELS[min(venom_level, 4)][1]
 
-            size_bn = make_size(seed, gid)
-            repro_bn = make_repro(seed, gid)
-            fact_bn = pick(seed, 21, nb.FACTS.get(gid, nb.FACTS["inverts"]))
+            size_bn = make_size(seed, bgid)
+            repro_bn = make_repro(seed, bgid)
+            fact_bn = pick(seed, 21, nb.FACTS.get(bgid, nb.FACTS["inverts"]))
             if "{n}" in fact_bn:
                 fact_bn = fact_bn.replace("{n}", bn_num(randint(seed, 22, 2, 200)))
 
@@ -525,8 +603,8 @@ def iter_species(total=TOTAL):
                 "en_name": en,
                 "sci_name": sci,
                 "authority": authority,
-                "kingdom": _kingdom(gid),
-                "phylum": _phylum(cls_sci, gid),
+                "kingdom": _kingdom(bgid),
+                "phylum": _phylum(cls_sci, bgid),
                 "class_id": cls_sci,
                 "class_bn": cls_bn,
                 "order_id": ord_sci,
@@ -542,6 +620,8 @@ def iter_species(total=TOTAL):
                 "region_bn": region_bn,
                 "region_en": region_en,
                 "habitat_bn": habitat_bn,
+                "region_key": "BD" if region_bn == "বাংলাদেশ" else reg[2],
+                "habitat_key": habitat_key(habitat_bn),
                 "diet_bn": diet_bn,
                 "iucn": iucn,
                 "size_bn": size_bn,

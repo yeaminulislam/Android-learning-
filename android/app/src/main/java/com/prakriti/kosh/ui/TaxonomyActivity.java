@@ -127,7 +127,10 @@ public class TaxonomyActivity extends BaseActivity {
         Ui.margins(stats, 0, Ui.dp(this, 12), 0, 0);
         box.addView(stats);
         if (group != null) {
-            stats.addView(statCell(Ui.humanCount(group.speciesCount), "প্রজাতি"));
+            if (group.globalCount > 0) {
+                stats.addView(statCell(Ui.humanCount(group.globalCount), "বিশ্বে নথিভুক্ত"));
+            }
+            stats.addView(statCell(Ui.humanCount(group.speciesCount), "এই অ্যাপে"));
             stats.addView(statCell(Ui.bnDigits(group.classCount), "শ্রেণি"));
             stats.addView(statCell(Ui.bnDigits(group.orderCount), "বর্গ"));
             stats.addView(statCell(Ui.bnDigits(group.familyCount), "পরিবার"));
@@ -148,7 +151,46 @@ public class TaxonomyActivity extends BaseActivity {
             }
         });
         box.addView(all);
+
+        // ── ব্লুপ্রিন্ট লেভেল ২: অঞ্চল ও পরিবেশ ফিল্টার ──
+        TextView rlab = Ui.text(this, "🌍 অঞ্চলভিত্তিক ফিল্টার", 12.5f,
+                Ui.color(this, R.color.text_secondary), true);
+        Ui.margins(rlab, 0, Ui.dp(this, 14), 0, Ui.dp(this, 6));
+        box.addView(rlab);
+        box.addView(chipScroll(repo.regions(), true));
+        TextView hlab = Ui.text(this, "🏞 পরিবেশভিত্তিক ফিল্টার", 12.5f,
+                Ui.color(this, R.color.text_secondary), true);
+        Ui.margins(hlab, 0, Ui.dp(this, 10), 0, Ui.dp(this, 6));
+        box.addView(hlab);
+        box.addView(chipScroll(repo.habitats(), false));
         return box;
+    }
+
+    /** পাশাপাশি স্ক্রোলযোগ্য চিপ-সারি; ক্লিকে ফিল্টার করা তালিকা খোলে। */
+    private View chipScroll(List<String[]> pairs, final boolean isRegion) {
+        android.widget.HorizontalScrollView sv = new android.widget.HorizontalScrollView(this);
+        sv.setHorizontalScrollBarEnabled(false);
+        LinearLayout row = Ui.hbox(this);
+        for (int i = 0; i < pairs.size(); i++) {
+            final String key = pairs.get(i)[0];
+            final String bn = pairs.get(i)[1];
+            TextView chip = Ui.chip(this, bn, Ui.tint(color, 0.90f));
+            chip.setTextColor(Ui.color(this, R.color.text_primary));
+            Ui.margins(chip, 0, 0, Ui.dp(this, 6), 0);
+            chip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SpeciesListActivity.start(v.getContext(), Repository.MODE_GROUP,
+                            groupId, null, null, null,
+                            (groupBn == null ? "" : groupBn) + " · " + bn, color,
+                            isRegion ? key : null, isRegion ? null : key,
+                            isRegion ? bn : null, isRegion ? null : bn);
+                }
+            });
+            row.addView(chip);
+        }
+        sv.addView(row);
+        return sv;
     }
 
     private View statCell(String value, String label) {

@@ -8,12 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.prakriti.kosh.R;
 import com.prakriti.kosh.data.Species;
 import com.prakriti.kosh.util.ArtView;
+import com.prakriti.kosh.util.PhotoStore;
 import com.prakriti.kosh.util.Ui;
 
 import java.util.ArrayList;
@@ -106,6 +108,11 @@ public class SpeciesAdapter extends BaseAdapter {
         ArtView art = new ArtView(c);
         art.setTag("art");
         artBox.addView(art, new FrameLayout.LayoutParams(Ui.dp(c, 88), Ui.dp(c, 88)));
+        ImageView photo = new ImageView(c);
+        photo.setTag("photo");
+        photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        photo.setVisibility(View.GONE);
+        artBox.addView(photo, new FrameLayout.LayoutParams(Ui.dp(c, 88), Ui.dp(c, 88)));
         row.addView(artBox, Ui.lp(Ui.dp(c, 88), Ui.dp(c, 88)));
 
         // লেখা
@@ -163,12 +170,14 @@ public class SpeciesAdapter extends BaseAdapter {
     private final class Holder {
         private final View root;
         private final ArtView art;
+        private final ImageView photo;
         private final TextView bn, en, sci;
         private final LinearLayout badges;
 
         Holder(View v) {
             root = v;
             art = (ArtView) v.findViewWithTag("art");
+            photo = (ImageView) v.findViewWithTag("photo");
             bn = (TextView) v.findViewWithTag("bn");
             en = (TextView) v.findViewWithTag("en");
             sci = (TextView) v.findViewWithTag("sci");
@@ -179,7 +188,17 @@ public class SpeciesAdapter extends BaseAdapter {
             bn.setText(s.bnName);
             en.setText(s.enName.length() > 0 ? s.enName : "—");
             sci.setText(s.sciName);
-            art.setSpecies(s, 0, true);
+            // আসল ছবি থাকলে সেটাই থাম্বনেইল, নাহলে আঁকা সিলুয়েট
+            android.graphics.Bitmap bmp = PhotoStore.thumb(root.getContext(), s.id);
+            if (bmp != null) {
+                photo.setImageBitmap(bmp);
+                photo.setVisibility(View.VISIBLE);
+                art.setVisibility(View.GONE);
+            } else {
+                photo.setVisibility(View.GONE);
+                art.setVisibility(View.VISIBLE);
+                art.setSpecies(s, 0, true);
+            }
             badges.removeAllViews();
             Context c = badges.getContext();
             int gap = Ui.dp(c, 6);

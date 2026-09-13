@@ -19,6 +19,20 @@ public final class PhotoStore {
     private PhotoStore() {
     }
 
+    /** থাম্বনেইল ক্যাশ (৬৪টি ছবি) — স্ক্রোলে বারবার ডিকোড এড়াতে। */
+    private static final android.util.LruCache<Long, Bitmap> THUMBS =
+            new android.util.LruCache<Long, Bitmap>(64);
+    private static final Bitmap MISS = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
+
+    /** তালিকার থাম্বনেইল — ছবি না থাকলে null (নেতিবাচক ফলও ক্যাশে থাকে)। */
+    public static Bitmap thumb(Context c, long id) {
+        Bitmap b = THUMBS.get(id);
+        if (b != null) return b == MISS ? null : b;
+        b = load(c, id, 176);
+        THUMBS.put(id, b == null ? MISS : b);
+        return b;
+    }
+
     /** assets-এর ভেতরে ছবির পথ। */
     public static String path(long id) {
         return "photos/" + id + ".webp";
