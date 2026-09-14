@@ -388,6 +388,14 @@
     marine: drawMarine, microbes: drawMicrobe, viruses: drawVirus, dinosaurs: drawDino,
   };
 
+  // ব্লুপ্রিন্টের নতুন বিভাগ-আইডি → আঁকার পুরোনো কী (অ্যাপের SpeciesArt.artKey-এর মতোই)
+  const ART_KEY = {
+    insects: 'inverts', arachnids: 'inverts', ants: 'inverts',
+    mollusks: 'marine', crustaceans: 'marine', other_inverts: 'marine',
+    snakes: 'reptiles', lizards_turtles: 'reptiles', micro_life: 'microbes',
+  };
+  const artKey = (g) => ART_KEY[g] || g;
+
   // ---------- পটভূমি ----------
   function backdrop(ctx, w, h, u, rnd, pal, group) {
     const night = pal.night;
@@ -432,7 +440,8 @@
       (variant || 0) + 1);
     const rnd = mulberry(seed);
     const u = Math.min(w, h);
-    const pal = palette(s.habitat_bn || '', s.group_id, variant || 0, rnd);
+    const gk = artKey(s.group_id || '');
+    const pal = palette(s.habitat_bn || '', gk, variant || 0, rnd);
 
     const g = ctx.createLinearGradient(0, 0, 0, h);
     g.addColorStop(0, hx(pal.top));
@@ -440,9 +449,9 @@
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
-    backdrop(ctx, w, h, u, rnd, pal, s.group_id);
+    backdrop(ctx, w, h, u, rnd, pal, gk);
 
-    const body = bodyColor(seed, s.group_id, s.venom_level || 0, !!s.extinct, rnd);
+    const body = bodyColor(seed, gk, s.venom_level || 0, !!s.extinct, rnd);
     const dark = shade(body, 0.35);
     const light = tint(body, 0.3);
 
@@ -450,7 +459,7 @@
     ctx.fillStyle = alpha(0x000000, 0.18);
     ctx.beginPath(); ctx.ellipse(w * 0.5, h * 0.9, u * 0.3, u * 0.05, 0, 0, 7); ctx.fill();
 
-    const painter = PAINTERS[s.group_id] || drawMammal;
+    const painter = PAINTERS[gk] || drawMammal;
     painter(ctx, w, h, u, rnd, body, dark, light);
 
     // নকশা (ডোরা/ছোপ)

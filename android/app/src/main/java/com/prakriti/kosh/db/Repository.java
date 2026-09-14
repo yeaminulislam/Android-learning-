@@ -117,13 +117,16 @@ public final class Repository {
 
     // ------------------------------------------------------------ বিভাগ ও শ্রেণিবিন্যাস
 
+    private static final String GROUP_COLS =
+            "group_id, bn_name, en_name, emoji, color, blurb_bn,"
+            + " species_count, class_count, order_count, family_count, sort_order";
+
     public List<CategoryGroup> groups() {
         List<CategoryGroup> out = new ArrayList<CategoryGroup>();
-        Cursor c = db.rawQuery(
-                "SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,"
-                + " species_count, class_count, order_count, family_count, sort_order,"
-                + " IFNULL(global_count, 0)"
-                + " FROM category_group ORDER BY sort_order", null);
+        Cursor c = queryGroups("SELECT " + GROUP_COLS + ", IFNULL(global_count, 0)"
+                + " FROM category_group ORDER BY sort_order", null,
+                "SELECT " + GROUP_COLS + ", 0 FROM category_group ORDER BY sort_order",
+                null);
         try {
             while (c.moveToNext()) out.add(CategoryGroup.from(c));
         } finally {
@@ -132,12 +135,22 @@ public final class Repository {
         return out;
     }
 
+    /** প্রথমে নতুন স্কিমার কুয়েরি; কোনো কারণে পুরোনো ডেটাবেস পড়লে ফলব্যাক। */
+    private Cursor queryGroups(String sql, String[] args, String fallback,
+                               String[] fallbackArgs) {
+        try {
+            return db.rawQuery(sql, args);
+        } catch (android.database.sqlite.SQLiteException e) {
+            return db.rawQuery(fallback, fallbackArgs);
+        }
+    }
+
     public CategoryGroup group(String groupId) {
-        Cursor c = db.rawQuery(
-                "SELECT group_id, bn_name, en_name, emoji, color, blurb_bn,"
-                + " species_count, class_count, order_count, family_count, sort_order,"
-                + " IFNULL(global_count, 0)"
-                + " FROM category_group WHERE group_id=?", new String[]{groupId});
+        Cursor c = queryGroups(
+                "SELECT " + GROUP_COLS + ", IFNULL(global_count, 0)"
+                + " FROM category_group WHERE group_id=?", new String[]{groupId},
+                "SELECT " + GROUP_COLS + ", 0 FROM category_group WHERE group_id=?",
+                new String[]{groupId});
         try {
             return c.moveToFirst() ? CategoryGroup.from(c) : null;
         } finally {

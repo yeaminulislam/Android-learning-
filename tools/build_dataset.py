@@ -531,7 +531,7 @@ def fill_fts(conn, batch=20000):
 
 def write_meta(conn, inserted, nc, total):
     rows = [
-        ("schema_version", "3"),
+        ("schema_version", "4"),
         ("app_id", "com.prakriti.kosh"),
         ("db_name", DB_NAME),
         ("built_at", time.strftime("%Y-%m-%d %H:%M:%S")),

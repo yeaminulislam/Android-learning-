@@ -34,7 +34,7 @@ public final class DatabaseManager {
     public static final String DB_NAME = "prakriti_kosh.db";
     public static final String ASSET = "db/prakriti_kosh.db.z";
     public static final String VERSION_KEY = "schema_version";
-    public static final String EXPECTED_VERSION = "3";
+    public static final String EXPECTED_VERSION = "4";
 
     private static final byte[] MAGIC = {'P', 'K', 'D', 'B', '1'};
     private static final int HEADER = 48;
@@ -70,12 +70,30 @@ public final class DatabaseManager {
         return new File(c.getFilesDir(), DB_NAME + ".ready");
     }
 
-    /** ডেটাবেস আগে থেকে প্রস্তুত কি না। */
+    /**
+     * ডেটাবেস আগে থেকে প্রস্তুত কি না — মার্কারের সংস্করণ ও বর্তমান APK-র
+     * সংরক্ষণাগারের আকার দুটোই মিলতে হবে। ফলে (ক) নতুন স্কিমা-সংস্করণে
+     * আপগ্রেড করলে পুরোনো ডেটাবেস আর ব্যবহৃত হয় না, (খ) ডেমো↔সম্পূর্ণ
+     * বদলালেও নতুন করে এক্সট্র্যাক্ট হয়।
+     */
     public static boolean isReady(Context c) {
         File m = markerFile(c);
         if (!m.exists()) return false;
         File db = dbFile(c);
-        return db.exists() && db.length() > 1024L * 1024L;
+        if (!db.exists() || db.length() <= 1024L * 1024L) return false;
+        String want = EXPECTED_VERSION + ":" + assetSize(c);
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(m);
+            byte[] buf = new byte[64];
+            int n = in.read(buf);
+            if (n <= 0) return false;
+            return want.equals(new String(buf, 0, n, "UTF-8"));
+        } catch (IOException e) {
+            return false;
+        } finally {
+            close(in);
+        }
     }
 
     /** সংরক্ষণাগারের আকার (বাইট) — প্রগ্রেস বারের জন্য। */
@@ -106,6 +124,16 @@ public final class DatabaseManager {
             File par = db.getParentFile();
             if (par != null && !par.exists()) par.mkdirs();
 
+            // পুরোনো সংস্করণের ডেটাবেস পড়ে থাকলে মুছে ফেলি — নতুন স্কিমায়
+            // আবার এক্সট্র্যাক্ট হবে, আর জায়গাও বাঁচবে (নইলে দুটি ডেটাবেস
+            // একসাথে ~১ জিবি চেয়ে বসত)
+            close();
+            if (db.exists()) {
+                db.delete();
+                new File(c.getFilesDir(), DB_NAME + "-wal").delete();
+                new File(c.getFilesDir(), DB_NAME + "-shm").delete();
+            }
+
             long total = assetSize(c);
             if (total <= 0) {
                 throw new IOException("অ্যাপের ভেতরে ডেটাবেস (assets/" + ASSET
@@ -125,7 +153,7 @@ public final class DatabaseManager {
                 copy(tmp, db);
                 tmp.delete();
             }
-            writeMarker(c, db.length());
+            writeMarker(c, total);
             if (progress != null) progress.onProgress(100, "প্রস্তুত!");
             Log.i(TAG, "database ready: " + db.length() + " bytes");
         }
