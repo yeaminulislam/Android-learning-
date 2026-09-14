@@ -209,6 +209,15 @@ public class SpeciesAdapter extends BaseAdapter {
             Ui.margins(badges.getChildAt(0), 0, 0, gap, 0);
 
             int n = 1;
+            if (!com.prakriti.kosh.db.Repository.get().isCurated(s.id)) {
+                badges.addView(Ui.chip(c, "নমুনা · কাল্পনিক",
+                                Ui.color(c, R.color.surface_alt)),
+                        Ui.lp(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                ((TextView) badges.getChildAt(n)).setTextColor(
+                        Ui.color(c, R.color.text_secondary));
+                Ui.margins(badges.getChildAt(n++), 0, 0, gap, 0);
+            }
             if (s.venomLevel >= 2) {
                 badges.addView(Ui.chip(c, "বিষ " + Ui.bnDigits(s.venomLevel),
                                 Ui.venomColor(c, s.venomLevel)),

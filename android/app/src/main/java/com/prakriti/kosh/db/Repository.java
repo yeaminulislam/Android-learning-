@@ -111,6 +111,25 @@ public final class Repository {
         return db;
     }
 
+    /** কিউরেটেড (বাস্তব) প্রজাতির সংখ্যা — meta থেকে একবার পড়া হয়। */
+    private long curatedTotal = -1;
+
+    /** এই id কি বাস্তব (কিউরেটেড) প্রজাতির? নাহলে নমুনা/জেনারেট-করা এন্ট্রি। */
+    public boolean isCurated(long id) {
+        if (curatedTotal < 0) {
+            Cursor c = db.rawQuery(
+                    "SELECT value FROM meta WHERE key='curated_total'", null);
+            try {
+                curatedTotal = c.moveToFirst() ? Long.parseLong(c.getString(0)) : 0;
+            } catch (Exception e) {
+                curatedTotal = 0;
+            } finally {
+                c.close();
+            }
+        }
+        return id > 0 && id <= curatedTotal;
+    }
+
     public boolean isReady() {
         return db != null && db.isOpen();
     }

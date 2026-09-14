@@ -117,6 +117,7 @@ public class SpeciesDetailActivity extends BaseActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
         body.addView(gallery(color));
+        if (!repo.isCurated(species.id)) body.addView(sampleBanner());
         body.addView(nameBlock());
         body.addView(taxonomyBlock(color));
         body.addView(factsBlock(color));
@@ -124,6 +125,20 @@ public class SpeciesDetailActivity extends BaseActivity {
         if (!related.isEmpty()) body.addView(relatedBlock(color));
 
         setContent(scroll);
+    }
+
+    /** জেনারেট-করা এন্ট্রির জন্য স্পষ্ট সতর্কবার্তা — যাতে কেউ ভুল না বোঝে। */
+    private View sampleBanner() {
+        TextView t = Ui.text(this,
+                "⚠ নমুনা এন্ট্রি: এটি বাস্তব প্রজাতি নয় — নাম, তথ্য ও ছবি সবই "
+                + "প্রোগ্রামে তৈরি ডেমো কনটেন্ট। বাস্তব প্রজাতি চেনার জন্য "
+                + "কিউরেটেড (আসল ছবিসহ) এন্ট্রিগুলো দেখুন।",
+                12.5f, Ui.color(this, R.color.text_secondary), false);
+        t.setLineSpacing(Ui.dp(this, 3), 1f);
+        t.setBackground(Ui.rounded(Ui.color(this, R.color.surface_alt), 12, this));
+        Ui.pad(t, Ui.dp(this, 14), Ui.dp(this, 12), Ui.dp(this, 14), Ui.dp(this, 12));
+        Ui.margins(t, Ui.dp(this, 12), Ui.dp(this, 10), Ui.dp(this, 12), 0);
+        return t;
     }
 
     // ------------------------------------------------------------ গ্যালারি

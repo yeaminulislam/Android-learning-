@@ -324,6 +324,7 @@ Actinopterygii|Cypriniformes|Gobioninae_fam|গবিওন
 Actinopterygii|Siluriformes|Bagridae|বাঘাইর
 Actinopterygii|Siluriformes|Schilbeidae|শিলবি
 Actinopterygii|Siluriformes|Clariidae|মাগুর
+Actinopterygii|Siluriformes|Siluridae|পাবদা-বোয়াল পরিবার
 Actinopterygii|Siluriformes|Sisoridae|পাহাড়ি চুঁই
 Actinopterygii|Siluriformes|Pangasiidae|পাঙ্গাস
 Actinopterygii|Siluriformes|Mochokidae|কুইকুই
