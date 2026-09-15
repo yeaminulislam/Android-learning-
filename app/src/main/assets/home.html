@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Shield Browser</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(160deg, #0a1929 0%, #0d47a1 140%);
+        color: #eaf2fb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 20px 32px;
+    }
+    .shield { font-size: 64px; margin-bottom: 6px; }
+    h1 { font-size: 26px; font-weight: 700; letter-spacing: .5px; }
+    .tagline { font-size: 14px; color: #9ecbff; margin-top: 4px; margin-bottom: 30px; }
+    form { width: 100%; max-width: 560px; display: flex; gap: 8px; }
+    input[type=text] {
+        flex: 1; padding: 14px 18px; font-size: 16px;
+        border: none; border-radius: 28px; outline: none;
+        background: rgba(255,255,255,.12); color: #fff;
+        backdrop-filter: blur(4px);
+    }
+    input::placeholder { color: #a8c6e8; }
+    button {
+        padding: 14px 22px; font-size: 16px; font-weight: 600;
+        border: none; border-radius: 28px; cursor: pointer;
+        background: #00c853; color: #04230f;
+    }
+    .dial {
+        margin-top: 38px; width: 100%; max-width: 560px;
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    }
+    .dial a {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        padding: 16px 6px; text-decoration: none; color: #eaf2fb; font-size: 13px;
+        background: rgba(255,255,255,.08); border-radius: 16px;
+        transition: background .15s ease;
+    }
+    .dial a:active { background: rgba(255,255,255,.2); }
+    .dial .ico { font-size: 26px; }
+    .note {
+        margin-top: auto; padding-top: 36px; font-size: 13px; color: #7fb5f5;
+        display: flex; align-items: center; gap: 6px;
+    }
+</style>
+</head>
+<body>
+    <div class="shield">🛡️</div>
+    <h1>Shield Browser</h1>
+    <div class="tagline">অ্যাড ও ট্র্যাকারমুক্ত দ্রুত ব্রাউজিং</div>
+
+    <form id="searchForm" action="https://shield.local/search" method="get">
+        <input type="text" id="q" name="q" placeholder="সার্চ করুন বা ঠিকানা লিখুন…" autocomplete="off">
+        <button type="submit">খুঁজুন</button>
+    </form>
+
+    <div class="dial">
+        <a href="https://m.youtube.com"><span class="ico">▶️</span>YouTube</a>
+        <a href="https://www.google.com"><span class="ico">🔍</span>Google</a>
+        <a href="https://www.wikipedia.org"><span class="ico">📚</span>Wikipedia</a>
+        <a href="https://m.facebook.com"><span class="ico">📘</span>Facebook</a>
+        <a href="https://x.com"><span class="ico">🐦</span>X</a>
+        <a href="https://github.com"><span class="ico">🐙</span>GitHub</a>
+        <a href="https://www.imdb.com"><span class="ico">🎬</span>IMDb</a>
+        <a href="https://duckduckgo.com"><span class="ico">🦆</span>DuckDuckGo</a>
+    </div>
+
+    <div class="note">🛡️ অ্যাড-ব্লক সুরক্ষা চালু আছে</div>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = document.getElementById('q').value.trim();
+        if (!q) return;
+        if (/^https?:\/\//i.test(q)) {
+            window.location.href = q;
+        } else if (/^[^\s]+\.[^\s]{2,}$/.test(q) && q.indexOf(' ') < 0) {
+            window.location.href = 'https://' + q;
+        } else {
+            window.location.href = 'https://shield.local/search?q=' + encodeURIComponent(q);
+        }
+    });
+</script>
+</body>
+</html>

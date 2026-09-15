@@ -1,0 +1,121 @@
+name: 🔨 Build & Release
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  প্রতিটি push-এ ডিবাগ APK বিল্ড হয় এবং artifact হিসেবে পাওয়া যায়।
+#  v*-ট্যাগ push (যেমন: v1.1.0) করলে স্বয়ংক্রিয়ভাবে GitHub Release তৈরি হয়
+#  এবং APK ফাইলগুলো সেখানে সংযুক্ত হয়।
+#
+#  (ঐচ্ছিক) সঠিক কী দিয়ে সাইন করতে চাইলে রিপোজিটরির
+#  Settings ▸ Secrets and variables ▸ Actions-এ এই secrets যোগ করুন:
+#    ANDROID_KEYSTORE_BASE64      – keystore ফাইলের base64 টেক্সট
+#    ANDROID_KEYSTORE_PASSWORD    – keystore-এর পাসওয়ার্ড
+#    ANDROID_KEY_ALIAS            – key alias
+#    ANDROID_KEY_PASSWORD         – key-এর পাসওয়ার্ড
+#  secrets না থাকলে debug-signed APK-ই রিলিজে যায় (আপডেট-ইনস্টলের আগে
+#  পুরনোটি আনইনস্টল করতে হবে)।
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # রিলিজ তৈরির জন্য প্রয়োজন
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    env:
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle (with cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Build release APK (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shield-browser-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      # ---- ঐচ্ছিক: secrets থাকলে release APK সাইন ----
+      - name: Decode signing keystore
+        if: startsWith(github.ref, 'refs/tags/v') && env.KEYSTORE_B64 != ''
+        run: echo "$KEYSTORE_B64" | base64 --decode > release.keystore
+
+      - name: Sign release APK
+        if: startsWith(github.ref, 'refs/tags/v') && env.KEYSTORE_B64 != ''
+        run: |
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
+          SIGNED=app/build/outputs/apk/release/app-release.apk
+          "$APKSIGNER" sign --ks release.keystore \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KEYSTORE_PASSWORD" \
+            --key-pass "pass:$KEY_PASSWORD" \
+            --out "$SIGNED" "$UNSIGNED"
+          "$APKSIGNER" verify "$SIGNED"
+
+      - name: Prepare release files
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          mkdir -p release-files
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "release-files/ShieldBrowser-${V}-debug.apk"
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk \
+               "release-files/ShieldBrowser-${V}-release.apk"
+          fi
+          ls -la release-files/
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Shield Browser ${{ github.ref_name }}
+          generate_release_notes: true
+          files: release-files/*.apk
+          body: |
+            ## 🛡️ Shield Browser ${{ github.ref_name }}
+
+            ### 📲 ইনস্টল
+            - ফোনে APK ডাউনলোড করে ট্যাপ করুন ("অজানা উৎস" থেকে ইনস্টলের অনুমতি লাগতে পারে)।
+            - সাইন্ড APK যুক্ত থাকলে সেটিই ব্যবহার করুন; না থাকলে debug APK দিয়েই চলবে
+              (তবে ভবিষ্যৎ সংস্করণ ইনস্টলের আগে পুরনোটি আনইনস্টল করতে হতে পারে)।
+
+            ### ✨ ফিচার
+            - 🛡️ শক্তিশালী মাল্টি-লেয়ার অ্যাড-ব্লকিং (EasyList + EasyPrivacy + StevenBlack)
+            - ▶️ YouTube ব্যাকগ্রাউন্ড প্লে + ⏭️ অ্যাড স্কিপার
+            - ⬇️ YouTube ভিডিও ডাউনলোডার (144p–4K)
+            - 🔌 ইউজারস্ক্রিপ্ট এক্সটেনশন সাপোর্ট (Greasyfork)
+            - 🗂️ মাল্টি-ট্যাব, বুকমার্ক, হিস্টোরি, ডেস্কটপ মোড

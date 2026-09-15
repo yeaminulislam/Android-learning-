@@ -1,0 +1,52 @@
+! Shield Browser extras - hand-curated rules
+! --- YouTube ad containers (belt & braces on top of youtube.js) ---
+youtube.com##ytd-ad-slot-renderer
+youtube.com##ytd-display-ad-renderer
+youtube.com##ytd-promoted-video-renderer
+youtube.com##ytd-compact-promoted-video-renderer
+youtube.com##ytd-banner-promo-renderer
+youtube.com##ytd-statement-banner-renderer
+youtube.com##ytd-in-feed-ad-layout-renderer
+youtube.com##ytd-promoted-sparkles-web-renderer
+youtube.com##ytd-promoted-sparkles-text-search-renderer
+youtube.com##yt-mealbar-promo-renderer
+youtube.com###player-ads
+youtube.com###masthead-ad
+m.youtube.com##.ad-slot
+! --- google search ads ---
+google.com##div[data-text-ad]
+google.com##.commercial-unit-mobile-top
+! --- common leftovers ---
+##.adsbygoogle
+##ins.adsbygoogle
+##div[id^="div-gpt-ad"]
+##.ad-banner
+||doubleclick.net^
+||googlesyndication.com^
+||googleadservices.com^
+||adservice.google.com^
+||pagead2.googlesyndication.com^
+||ads.youtube.com^
+||analytics.youtube.com^
+||scorecardresearch.com^
+||amazon-adsystem.com^
+||ads.yahoo.com^
+||advertising.com^
+||outbrain.com^
+||taboola.com^
+||criteo.com^
+||criteo.net^
+||pubmatic.com^
+||rubiconproject.com^
+||openx.net^
+||appnexus.com^
+||adnxs.com^
+||quantserve.com^
+||adcolony.com^
+||admob.com^
+||moatads.com^
+||inmobi.com^
+||chartbeat.com^
+||hotjar.com^
+||fullstory.com^
+||mouseflow.com^
