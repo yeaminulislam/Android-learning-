@@ -1,8 +1,8 @@
 package com.shieldbrowser.app.ext
 
 /**
- * Chrome/Firefox-style match patterns (`*://*.example.com/*`) and
- * Greasemonkey globs (`*.google.com/*`) converted to cached regexes.
+ * Chrome/Firefox-style match patterns (e.g. `*://*.example.com/path`) and
+ * Greasemonkey globs (e.g. `*.google.com/path`) converted to cached regexes.
  */
 object MatchPattern {
 
