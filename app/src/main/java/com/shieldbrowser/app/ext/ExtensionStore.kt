@@ -179,7 +179,7 @@ object ExtensionStore {
                 } catch (e: Exception) {
                     JSONObject()
                 }
-                js.put(key, JSONObject.quoteIfNeeded(jsonValue))
+                js.put(key, parseJsonValue(jsonValue))
                 f.writeText(js.toString())
             } catch (ignored: Exception) {
             }
@@ -199,8 +199,8 @@ object ExtensionStore {
         }
     }
 
-    private fun JSONObject.quoteIfNeeded(raw: String): Any {
-        // The bridge sends us JSON-encoded values; store re-parsed.
+    private fun parseJsonValue(raw: String): Any {
+        // The bridge sends JSON-encoded values; store them re-parsed.
         return try {
             org.json.JSONTokener(raw).nextValue()
         } catch (e: Exception) {
