@@ -54,7 +54,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        id: debugBuild
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --stacktrace --console=plain 2>&1 | tee build-debug.log
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.run_number }}
+          path: build-debug.log
+          if-no-files-found: ignore
 
       - name: Build release APK (tag builds only)
         if: startsWith(github.ref, 'refs/tags/v')
