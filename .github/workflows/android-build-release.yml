@@ -67,6 +67,18 @@ jobs:
           path: build-debug.log
           if-no-files-found: ignore
 
+      - name: Report failure as annotations + summary
+        if: failure()
+        run: |
+          echo "## ❌ Build failed — key error lines" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          ERRS=$(grep -n -E "^e: |error:|FAILED|FAILURE:|Execution failed|What went wrong|Caused by|A problem occurred" build-debug.log | tail -45)
+          echo "$ERRS" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "$ERRS" | tail -30 | while IFS= read -r line; do
+            [ -n "$line" ] && echo "::error ::$line"
+          done
+
       - name: Build release APK (tag builds only)
         if: startsWith(github.ref, 'refs/tags/v')
         run: ./gradlew assembleRelease --no-daemon --stacktrace
