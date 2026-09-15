@@ -1,23 +1,15 @@
-# বড় বিল্ড-আর্টিফ্যাক্ট git-এ রাখা হবে না
-build/
-data/dist/
-data/dist-demo/
-data/**/*.db
-data/**/*.db.z
-web/*.apk
-android/app/src/main/assets/db/*.db
-android/app/src/main/assets/db/*.db.z
-android/app/src/main/assets/db/*.json
-*.apk
-!dist/prakriti-kosh.apk
-!dist/prakriti-kosh-demo.apk
-!dist/install-test.apk
-*.aab
-.gradle/
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
 local.properties
-__pycache__/
-*.pyc
-
-# ছবির উৎস (নামানো মূল jpg/png) — git-এ নয়; webp ছোট তাই রাখা হয়
-image-search/
-data/photos/curated.tsv
+*.apk
+*.aab
+*.keystore
+!debug.keystore

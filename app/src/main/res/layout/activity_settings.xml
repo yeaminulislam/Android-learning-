@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:titleTextColor="@color/white" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView style="@style/SettingsHeader" android:text="@string/prefs_protection" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchAdBlock"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_adblock" />
+            <TextView style="@style/SettingsSub" android:text="@string/prefs_adblock_sub" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchCosmetic"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_cosmetic" />
+            <TextView style="@style/SettingsSub" android:text="@string/prefs_cosmetic_sub" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPopups"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_popups" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchYtSkip"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_yt_skip" />
+            <TextView style="@style/SettingsSub" android:text="@string/prefs_yt_skip_sub" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchBackground"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_background" />
+            <TextView style="@style/SettingsSub" android:text="@string/prefs_background_sub" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/prefs_general" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchDesktop"
+                style="@style/SettingsSwitch"
+                android:text="@string/prefs_desktop" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/prefs_search_engine" />
+            <RadioGroup
+                android:id="@+id/radioSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/radioGoogle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/search_engine_google"
+                    android:textSize="16sp" />
+                <RadioButton
+                    android:id="@+id/radioDuckDuckGo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/search_engine_duckduckgo"
+                    android:textSize="16sp" />
+                <RadioButton
+                    android:id="@+id/radioBing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/search_engine_bing"
+                    android:textSize="16sp" />
+                <RadioButton
+                    android:id="@+id/radioBrave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/search_engine_brave"
+                    android:textSize="16sp" />
+            </RadioGroup>
+
+            <TextView style="@style/SettingsHeader" android:text="@string/prefs_filters" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdateFilters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/prefs_update_filters" />
+            <TextView style="@style/SettingsSub" android:text="@string/prefs_update_filters_sub" />
+            <TextView
+                android:id="@+id/filterStatus"
+                style="@style/SettingsSub" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/prefs_clear_history" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/prefs_about" />
+            <TextView android:id="@+id/versionText" style="@style/SettingsSub" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

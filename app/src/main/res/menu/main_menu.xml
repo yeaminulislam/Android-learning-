@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_forward"
+        android:title="@string/forward"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_reload"
+        android:title="@string/reload"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_home"
+        android:title="@string/go_home"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_add_bookmark"
+        android:title="@string/add_bookmark"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_download"
+        android:title="@string/download_video"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_extensions"
+        android:title="@string/extensions"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_bookmarks"
+        android:title="@string/bookmarks"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_history"
+        android:title="@string/history"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_shield"
+        android:title="@string/shield_info"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_background_play"
+        android:checkable="true"
+        android:title="@string/background_play_menu"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_desktop"
+        android:checkable="true"
+        android:title="@string/desktop_mode"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_exit"
+        android:title="@string/exit_app"
+        app:showAsAction="never" />
+</menu>

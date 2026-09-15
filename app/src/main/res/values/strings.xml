@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shield Browser</string>
+    <string name="search_hint">Search or type address</string>
+    <string name="channel_playback">Background playback</string>
+    <string name="tabs_title">Tabs</string>
+
+    <!-- Menu -->
+    <string name="forward">Forward</string>
+    <string name="reload">Reload</string>
+    <string name="go_home">Home</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="shield_info">Shield statistics</string>
+    <string name="background_play_menu">Background play</string>
+    <string name="desktop_mode">Desktop mode</string>
+    <string name="download_video">Download video</string>
+    <string name="extensions">Extensions</string>
+    <string name="open_tabs">Tabs</string>
+    <string name="exit_app">Exit</string>
+
+    <!-- Extensions / userscripts -->
+    <string name="extensions_title">Extensions</string>
+    <string name="extensions_empty">No userscripts installed yet.\nTap + to find scripts on Greasyfork.</string>
+    <string name="extensions_add">Find extensions</string>
+    <string name="script_install_title">Install userscript?</string>
+    <string name="script_install_btn">Install</string>
+    <string name="script_installed">Installed ✔</string>
+    <string name="script_updated">Updated ✔</string>
+    <string name="script_install_failed">Could not install this script</string>
+    <string name="script_removed">Removed</string>
+    <string name="script_matches_label">Runs on:</string>
+    <string name="script_open_source">Open source page</string>
+
+    <!-- YouTube downloader -->
+    <string name="fetching_video">Fetching video info…</string>
+    <string name="not_youtube_page">Open a YouTube video page first</string>
+    <string name="video_fetch_failed">Could not fetch downloadable streams 😕</string>
+    <string name="choose_quality">Choose quality to download</string>
+    <string name="dl_with_audio">with audio</string>
+    <string name="dl_no_audio">video only (silent)</string>
+    <string name="dl_audio_only">audio only</string>
+    <string name="dl_unknown_size">size unknown</string>
+
+    <!-- Media notification -->
+    <string name="notif_playing">Playing in background</string>
+    <string name="notif_tap_return">Tap to return to the browser</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_stop">Stop</string>
+
+    <!-- Shield / ad-block -->
+    <string name="shield_active_toast">🛡️ Shield active — %1$d blocked domains, %2$d rules</string>
+    <string name="shield_info_title">🛡️ Shield statistics</string>
+    <string name="shield_info_msg">Blocked on this page: %1$d\nBlocked in this session: %2$d\nTotal blocked ever: %3$d\n\nFilter sources: %4$s\nRules loaded: %5$d\nBlocked domains: %6$d</string>
+    <string name="shield_loading">Shield is loading filter lists…</string>
+    <string name="background_play_on">Background play ON — audio keeps playing when you leave the app</string>
+    <string name="background_play_off">Background play OFF</string>
+
+    <!-- Toasts -->
+    <string name="bookmark_added">Bookmark added</string>
+    <string name="bookmark_removed">Bookmark removed</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="updating_filters">Updating filter lists…</string>
+    <string name="filters_updated">Filter lists updated ✔</string>
+    <string name="filters_update_failed">Update failed — check internet connection</string>
+    <string name="blocked_popup">Pop-up blocked 🛡️</string>
+    <string name="ssl_error_title">Security warning</string>
+    <string name="ssl_error_msg">The certificate of this site is invalid. Continue anyway?</string>
+    <string name="ssl_continue">Continue</string>
+    <string name="cant_open_link">No app found to open this link</string>
+    <string name="download_started">Download started…</string>
+    <string name="new_tab">New tab</string>
+    <string name="empty_bookmarks">No bookmarks yet</string>
+    <string name="empty_history">History is empty</string>
+    <string name="delete">Delete</string>
+
+    <!-- Settings -->
+    <string name="prefs_protection">Protection</string>
+    <string name="prefs_adblock">Ad &amp; tracker blocking</string>
+    <string name="prefs_adblock_sub">Blocks ads, trackers, malware and phishing domains</string>
+    <string name="prefs_cosmetic">Hide ad placeholders</string>
+    <string name="prefs_cosmetic_sub">Cosmetic filtering — removes empty ad boxes from pages</string>
+    <string name="prefs_popups">Block pop-ups</string>
+    <string name="prefs_yt_skip">YouTube ad skipper</string>
+    <string name="prefs_yt_skip_sub">Auto-skips and fast-forwards video ads on YouTube</string>
+    <string name="prefs_background">Background playback</string>
+    <string name="prefs_background_sub">Keep YouTube/media audio playing when the screen is off or the app is minimized</string>
+    <string name="prefs_general">General</string>
+    <string name="prefs_desktop">Desktop mode (User-Agent)</string>
+    <string name="prefs_search_engine">Search engine</string>
+    <string name="prefs_filters">Filter lists</string>
+    <string name="prefs_update_filters">Update filter lists now</string>
+    <string name="prefs_update_filters_sub">Downloads the newest EasyList / StevenBlack lists</string>
+    <string name="prefs_clear_history">Clear browsing history</string>
+    <string name="prefs_about">About</string>
+    <string name="prefs_version">Version</string>
+    <string name="search_engine_google">Google</string>
+    <string name="search_engine_duckduckgo">DuckDuckGo</string>
+    <string name="search_engine_bing">Bing</string>
+    <string name="search_engine_brave">Brave Search</string>
+    <!-- crash report dialog -->
+    <string name="crash_title">🐞 Last session ended unexpectedly</string>
+    <string name="crash_msg">The app closed because of an error. Copy this log and send it to the developer so it can be fixed:</string>
+    <string name="crash_copy">Copy log</string>
+    <string name="crash_dismiss">Ignore</string>
+    <string name="crash_copied">Log copied ✓ — please share it with the developer</string>
+</resources>

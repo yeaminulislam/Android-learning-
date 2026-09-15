@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">শিল্ড ব্রাউজার</string>
+    <string name="search_hint">সার্চ করুন বা ঠিকানা লিখুন</string>
+    <string name="channel_playback">ব্যাকগ্রাউন্ড প্লেব্যাক</string>
+    <string name="tabs_title">ট্যাবসমূহ</string>
+
+    <!-- Menu -->
+    <string name="forward">সামনে</string>
+    <string name="reload">রিলোড</string>
+    <string name="go_home">হোম</string>
+    <string name="bookmarks">বুকমার্ক</string>
+    <string name="add_bookmark">বুকমার্ক যোগ করুন</string>
+    <string name="history">হিস্টোরি</string>
+    <string name="settings">সেটিংস</string>
+    <string name="shield_info">শিল্ড পরিসংখ্যান</string>
+    <string name="background_play_menu">ব্যাকগ্রাউন্ড প্লে</string>
+    <string name="desktop_mode">ডেস্কটপ মোড</string>
+    <string name="download_video">ভিডিও ডাউনলোড</string>
+    <string name="extensions">এক্সটেনশন</string>
+    <string name="open_tabs">ট্যাব</string>
+    <string name="exit_app">বের হন</string>
+
+    <!-- Extensions / userscripts -->
+    <string name="extensions_title">এক্সটেনশন</string>
+    <string name="extensions_empty">এখনও কোনো ইউজারস্ক্রিপ্ট ইনস্টল নেই।\nGreasyfork থেকে স্ক্রিপ্ট খুঁজতে + চাপুন।</string>
+    <string name="extensions_add">এক্সটেনশন খুঁজুন</string>
+    <string name="script_install_title">ইউজারস্ক্রিপ্ট ইনস্টল করবেন?</string>
+    <string name="script_install_btn">ইনস্টল</string>
+    <string name="script_installed">ইনস্টল সম্পন্ন ✔</string>
+    <string name="script_updated">আপডেট সম্পন্ন ✔</string>
+    <string name="script_install_failed">স্ক্রিপ্টটি ইনস্টল করা গেল না</string>
+    <string name="script_removed">সরিয়ে ফেলা হয়েছে</string>
+    <string name="script_matches_label">চলবে এখানে:</string>
+    <string name="script_open_source">সোর্স পেজ খুলুন</string>
+
+    <!-- YouTube downloader -->
+    <string name="fetching_video">ভিডিওর তথ্য আনা হচ্ছে…</string>
+    <string name="not_youtube_page">আগে ইউটিউব ভিডিও পেজ খুলুন</string>
+    <string name="video_fetch_failed">ডাউনলোডযোগ্য স্ট্রিম পাওয়া যায়নি 😕</string>
+    <string name="choose_quality">কোয়ালিটি বেছে নিন</string>
+    <string name="dl_with_audio">অডিওসহ</string>
+    <string name="dl_no_audio">শুধু ভিডিও (নীরব)</string>
+    <string name="dl_audio_only">শুধু অডিও</string>
+    <string name="dl_unknown_size">সাইজ অজানা</string>
+
+    <!-- Media notification -->
+    <string name="notif_playing">ব্যাকগ্রাউন্ডে চলছে</string>
+    <string name="notif_tap_return">ব্রাউজারে ফিরতে ট্যাপ করুন</string>
+    <string name="action_play">চালান</string>
+    <string name="action_pause">থামান</string>
+    <string name="action_stop">বন্ধ</string>
+
+    <!-- Shield / ad-block -->
+    <string name="shield_active_toast">🛡️ শিল্ড চালু — %1$d ব্লকড ডোমেইন, %2$d রুল</string>
+    <string name="shield_info_title">🛡️ শিল্ড পরিসংখ্যান</string>
+    <string name="shield_info_msg">এই পেজে ব্লক হয়েছে: %1$d\nএই সেশনে ব্লক হয়েছে: %2$d\nমোট ব্লক হয়েছে: %3$d\n\nফিল্টার উৎস: %4$s\nলোডেড রুল: %5$d\nব্লকড ডোমেইন: %6$d</string>
+    <string name="shield_loading">শিল্ড ফিল্টার লিস্ট লোড করছে…</string>
+    <string name="background_play_on">ব্যাকগ্রাউন্ড প্লে চালু — অ্যাপ থেকে বের হলেও অডিও চলতে থাকবে</string>
+    <string name="background_play_off">ব্যাকগ্রাউন্ড প্লে বন্ধ</string>
+
+    <!-- Toasts -->
+    <string name="bookmark_added">বুকমার্ক যোগ হয়েছে</string>
+    <string name="bookmark_removed">বুকমার্ক সরানো হয়েছে</string>
+    <string name="history_cleared">হিস্টোরি মুছে ফেলা হয়েছে</string>
+    <string name="updating_filters">ফিল্টার লিস্ট আপডেট হচ্ছে…</string>
+    <string name="filters_updated">ফিল্টার লিস্ট আপডেট সম্পন্ন ✔</string>
+    <string name="filters_update_failed">আপডেট ব্যর্থ — ইন্টারনেট সংযোগ দেখুন</string>
+    <string name="blocked_popup">পপ-আপ ব্লক হয়েছে 🛡️</string>
+    <string name="ssl_error_title">নিরাপত্তা সতর্কতা</string>
+    <string name="ssl_error_msg">এই সাইটের সার্টিফিকেট সঠিক নয়। তবুও চালিয়ে যাবেন?</string>
+    <string name="ssl_continue">চালিয়ে যান</string>
+    <string name="cant_open_link">এই লিংক খোলার মতো অ্যাপ পাওয়া যায়নি</string>
+    <string name="download_started">ডাউনলোড শুরু হয়েছে…</string>
+    <string name="new_tab">নতুন ট্যাব</string>
+    <string name="empty_bookmarks">এখনও কোনো বুকমার্ক নেই</string>
+    <string name="empty_history">হিস্টোরি খালি</string>
+    <string name="delete">মুছুন</string>
+
+    <!-- Settings -->
+    <string name="prefs_protection">সুরক্ষা</string>
+    <string name="prefs_adblock">অ্যাড ও ট্র্যাকার ব্লকিং</string>
+    <string name="prefs_adblock_sub">অ্যাড, ট্র্যাকার, ম্যালওয়্যার ও ফিশিং ডোমেইন ব্লক করে</string>
+    <string name="prefs_cosmetic">অ্যাডের ফাঁকা জায়গা লুকান</string>
+    <string name="prefs_cosmetic_sub">কসমেটিক ফিল্টারিং — পেজ থেকে খালি অ্যাড-বক্স সরিয়ে দেয়</string>
+    <string name="prefs_popups">পপ-আপ ব্লক</string>
+    <string name="prefs_yt_skip">ইউটিউব অ্যাড স্কিপার</string>
+    <string name="prefs_yt_skip_sub">ইউটিউবে ভিডিও অ্যাড নিজে থেকেই স্কিপ ও ফাস্ট-ফরোয়ার্ড করে</string>
+    <string name="prefs_background">ব্যাকগ্রাউন্ড প্লেব্যাক</string>
+    <string name="prefs_background_sub">স্ক্রিন বন্ধ বা অ্যাপ মিনিমাইজ করলেও ইউটিউব/মিডিয়ার অডিও চলতে থাকবে</string>
+    <string name="prefs_general">সাধারণ</string>
+    <string name="prefs_desktop">ডেস্কটপ মোড (User-Agent)</string>
+    <string name="prefs_search_engine">সার্চ ইঞ্জিন</string>
+    <string name="prefs_filters">ফিল্টার লিস্ট</string>
+    <string name="prefs_update_filters">এখনই ফিল্টার লিস্ট আপডেট করুন</string>
+    <string name="prefs_update_filters_sub">নতুন EasyList / StevenBlack লিস্ট ডাউনলোড করে</string>
+    <string name="prefs_clear_history">ব্রাউজিং হিস্টোরি মুছুন</string>
+    <string name="prefs_about">সম্পর্কে</string>
+    <string name="prefs_version">সংস্করণ</string>
+    <string name="search_engine_google">গুগল</string>
+    <string name="search_engine_duckduckgo">ডাকডাকগো</string>
+    <string name="search_engine_bing">বিং</string>
+    <string name="search_engine_brave">ব্রেভ সার্চ</string>
+    <!-- crash report dialog -->
+    <string name="crash_title">🐞 আগেরবার অ্যাপ ক্র্যাশ করেছিল</string>
+    <string name="crash_msg">একটি এররের কারণে অ্যাপ বন্ধ হয়ে গেছে। নিচের লগটি কপি করে ডেভেলপারকে পাঠালে দ্রুত সমাধান করা সম্ভব হবে:</string>
+    <string name="crash_copy">লগ কপি করুন</string>
+    <string name="crash_dismiss">উপেক্ষা করুন</string>
+    <string name="crash_copied">লগ কপি হয়েছে ✓ — ডেভেলপারের কাছে পাঠিয়ে দিন</string>
+</resources>
